@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Reveal } from "./Reveal";
 import { cn } from "@/lib/utils";
+import { submitInquiry } from "@/lib/supabase";
 
 const EMAIL = "mnwcreativestudio@gmail.com";
 
@@ -49,6 +50,7 @@ export function Contact() {
   const [fields, setFields] = useState<Fields>(initialFields);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedMessage, setCopiedMessage] = useState(false);
@@ -111,8 +113,10 @@ export function Contact() {
     return { subject, body };
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
     setErrorMessage(null);
 
     // Form validation
@@ -129,14 +133,28 @@ export function Contact() {
       return;
     }
 
-    const { subject, body } = getEmailContent();
+    setIsSubmitting(true);
 
-    // Trigger user mail client
-    window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+    try {
+      await submitInquiry({
+        name: fields.name,
+        email: fields.email,
+        business: fields.business,
+        projectType: fields.projectType || selectedPlan || null,
+        message: fields.message,
+      });
 
-    setSent(true);
+      setSent(true);
+    } catch (err: unknown) {
+      console.error("Inquiry submission error:", err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to submit your inquiry. Please try again or reach out to us directly via email.";
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopyEmail = () => {
@@ -158,6 +176,7 @@ export function Contact() {
     setSelectedPlan(null);
     setSent(false);
     setErrorMessage(null);
+    setIsSubmitting(false);
   };
 
   const inputClass =
@@ -318,10 +337,11 @@ export function Contact() {
                       id="contact-name"
                       type="text"
                       required
+                      disabled={isSubmitting}
                       value={fields.name}
                       onChange={update("name")}
                       placeholder="Your full name"
-                      className={inputClass}
+                      className={cn(inputClass, isSubmitting && "opacity-70 cursor-not-allowed")}
                     />
                   </div>
 
@@ -337,10 +357,11 @@ export function Contact() {
                       id="contact-email"
                       type="email"
                       required
+                      disabled={isSubmitting}
                       value={fields.email}
                       onChange={update("email")}
                       placeholder="you@company.com"
-                      className={inputClass}
+                      className={cn(inputClass, isSubmitting && "opacity-70 cursor-not-allowed")}
                     />
                   </div>
 
@@ -355,10 +376,11 @@ export function Contact() {
                     <input
                       id="contact-business"
                       type="text"
+                      disabled={isSubmitting}
                       value={fields.business}
                       onChange={update("business")}
                       placeholder="Your company or studio"
-                      className={inputClass}
+                      className={cn(inputClass, isSubmitting && "opacity-70 cursor-not-allowed")}
                     />
                   </div>
 
@@ -372,9 +394,10 @@ export function Contact() {
                     </label>
                     <select
                       id="contact-plan"
+                      disabled={isSubmitting}
                       value={fields.projectType}
                       onChange={update("projectType")}
-                      className={cn(inputClass, "cursor-pointer")}
+                      className={cn(inputClass, "cursor-pointer", isSubmitting && "opacity-70 cursor-not-allowed")}
                     >
                       <option value="">Select a plan or service</option>
                       <optgroup label="Website Plans">
@@ -408,11 +431,12 @@ export function Contact() {
                   <textarea
                     id="contact-message"
                     required
+                    disabled={isSubmitting}
                     rows={5}
                     value={fields.message}
                     onChange={update("message")}
                     placeholder="Tell us about your project requirements, target timeline, and goals..."
-                    className={cn(inputClass, "resize-none")}
+                    className={cn(inputClass, "resize-none", isSubmitting && "opacity-70 cursor-not-allowed")}
                   />
                 </div>
 
@@ -420,10 +444,23 @@ export function Contact() {
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="submit"
-                    className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-9 py-4 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[var(--shadow-gold)] hover:brightness-110 active:scale-95 sm:w-auto"
+                    disabled={isSubmitting}
+                    className={cn(
+                      "group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-9 py-4 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[var(--shadow-gold)] hover:brightness-110 active:scale-95 sm:w-auto",
+                      isSubmitting && "cursor-not-allowed opacity-80",
+                    )}
                   >
-                    <span>Submit Inquiry</span>
-                    <Send className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    {isSubmitting ? (
+                      <>
+                        <RefreshCw className="size-4 animate-spin" />
+                        <span>Submitting Inquiry...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Submit Inquiry</span>
+                        <Send className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      </>
+                    )}
                   </button>
 
                   <span className="text-xs text-muted-foreground">Direct reply to {EMAIL}</span>
@@ -434,13 +471,13 @@ export function Contact() {
                   <div className="mt-8 rounded-2xl border border-gold/40 bg-gold/10 p-6 transition-all duration-300">
                     <div className="flex items-center gap-2.5 text-sm font-bold text-gold">
                       <Check className="size-4 shrink-0" />
-                      <span>Inquiry Prepared Successfully!</span>
+                      <span>Inquiry Submitted Successfully!</span>
                     </div>
 
                     <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                      Your message draft has been generated for{" "}
-                      <span className="font-semibold text-foreground">{EMAIL}</span>. You can
-                      complete sending via your preferred method below:
+                      Thank you! Your project inquiry has been delivered directly to{" "}
+                      <span className="font-semibold text-foreground">{EMAIL}</span>. We will review
+                      your project goals and respond via email within 24 hours.
                     </p>
 
                     <div className="mt-4 flex flex-wrap items-center gap-2.5">
