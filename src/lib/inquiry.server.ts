@@ -378,12 +378,18 @@ export async function sendInquiryOtp(
     const isProd = typeof process !== "undefined" && process.env && process.env["NODE_ENV"] === "production";
     if (isProd) {
       const proc = typeof process !== "undefined" && process.env ? process.env : {};
-      const resendInProc = Object.keys(proc).some((k) => k.trim().toUpperCase() === "RESEND_API_KEY");
+      const resendDirect = Boolean(process.env?.RESEND_API_KEY);
+      const resendBracket = Boolean((proc as Record<string, string | undefined>)["RESEND_API_KEY"]);
+      const matchingKeyName = Object.keys(proc).find((k) => k.trim().toLowerCase().includes("resend")) || "none";
+      const razorpayConfigured = Boolean((proc as Record<string, string | undefined>)["RAZORPAY_KEY_SECRET"]);
+      const totalKeys = Object.keys(proc).length;
+
       console.error(
-        `[InquiryServer] RESEND_API_KEY missing at server runtime. resendKeyFoundInProcessEnv=${resendInProc}, processEnvKeysCount=${Object.keys(proc).length}`,
+        `[InquiryServer] RESEND_API_KEY missing at server runtime. resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyName=${matchingKeyName}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}`,
       );
+
       throw new Error(
-        "Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing.",
+        `Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing. [Diagnostic: resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyName=${matchingKeyName}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}]`,
       );
     }
     console.warn(
