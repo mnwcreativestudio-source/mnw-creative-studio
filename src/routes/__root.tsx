@@ -77,25 +77,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MNW Creative Studio — Modern Websites for Modern Businesses" },
-      { name: "description", content: "MNW Creative Studio designs and builds high-converting, bespoke websites for modern businesses." },
+      { title: "MNW Creative Studio | Modern Web Design & Development" },
+      {
+        name: "description",
+        content:
+          "MNW Creative Studio creates modern, responsive and high-performing websites for businesses, brands and individuals.",
+      },
       { name: "author", content: "MNW Creative Studio" },
-      { property: "og:title", content: "MNW Creative Studio — Modern Websites for Modern Businesses" },
-      { property: "og:description", content: "MNW Creative Studio designs and builds high-converting, bespoke websites for modern businesses." },
+      {
+        property: "og:title",
+        content: "MNW Creative Studio | Modern Web Design & Development",
+      },
+      {
+        property: "og:description",
+        content:
+          "MNW Creative Studio creates modern, responsive and high-performing websites for businesses, brands and individuals.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      {
+        name: "twitter:title",
+        content: "MNW Creative Studio | Modern Web Design & Development",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "MNW Creative Studio creates modern, responsive and high-performing websites for businesses, brands and individuals.",
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", sizes: "any" },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "icon", href: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { rel: "icon", href: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-      { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "icon", href: "/favicon.ico?v=2", sizes: "any" },
+      { rel: "icon", href: "/favicon.png?v=2", type: "image/png" },
+      { rel: "icon", href: "/favicon-32x32.png?v=2", sizes: "32x32", type: "image/png" },
+      { rel: "icon", href: "/favicon-16x16.png?v=2", sizes: "16x16", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=2" },
+      { rel: "manifest", href: "/site.webmanifest?v=2" },
     ],
   }),
   shellComponent: RootShell,

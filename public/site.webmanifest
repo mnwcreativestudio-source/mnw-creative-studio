@@ -3,27 +3,27 @@
   "short_name": "MNW",
   "icons": [
     {
-      "src": "/favicon-16x16.png",
+      "src": "/favicon-16x16.png?v=2",
       "sizes": "16x16",
       "type": "image/png"
     },
     {
-      "src": "/favicon-32x32.png",
+      "src": "/favicon-32x32.png?v=2",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/favicon.png",
-      "sizes": "256x256",
+      "src": "/favicon.png?v=2",
+      "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/apple-touch-icon.png",
+      "src": "/apple-touch-icon.png?v=2",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/mnw-square-favicon.png",
+      "src": "/mnw-square-favicon.png?v=2",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
