@@ -63,6 +63,7 @@ const featuredProjects = [
     description:
       "Artisan culinary showcase featuring sensory food photography, digital menus, and streamlined table reservation flows.",
     image: workUrbanEats,
+    liveUrl: "https://urban-eats-demo-mnw-three.vercel.app",
   },
   {
     id: "luxury-real-estate",
@@ -111,6 +112,97 @@ function Index() {
 
         {/* 2. Studio Capabilities Ticker Strip */}
         <ValueStrip />
+
+        {/* 2.5 Strong Editorial Positioning Statement (Inspired by Urban Eats storytelling) */}
+        <section className="relative py-28 sm:py-36 overflow-hidden border-t border-white/[0.06] bg-gradient-to-b from-background via-charcoal/20 to-background">
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[46rem] rounded-full bg-gold/[0.035] blur-[160px]" />
+          </div>
+
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <Reveal className="max-w-4xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1 text-[0.7rem] font-bold tracking-[0.25em] text-gold uppercase shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+                <Sparkles className="size-3" />
+                The Studio Philosophy
+              </span>
+
+              <h2 className="mt-6 font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] text-balance text-foreground tracking-tight">
+                We engineer digital experiences for brands that refuse to look like{" "}
+                <span className="text-shimmer">everyone else.</span>
+              </h2>
+
+              <p className="mt-7 text-base sm:text-lg leading-relaxed text-muted-foreground font-normal max-w-3xl">
+                In a digital landscape crowded with interchangeable templates and sluggish page builders,
+                MNW Creative Studio crafts websites from first principles. By harmonizing sculptural typography,
+                bespoke UI/UX, and sub-second React engineering, we turn your online presence into an authoritative
+                business asset that commands trust and converts visitors into high-value clients.
+              </p>
+            </Reveal>
+
+            {/* 3 Studio Pillars */}
+            <div className="mt-16 grid gap-6 sm:grid-cols-3">
+              <Reveal delay={60}>
+                <div className="group relative flex h-full flex-col justify-between rounded-[2.25rem] border border-white/[0.08] bg-charcoal/40 p-8 backdrop-blur-xl shadow-lg transition-all duration-400 hover:border-gold/50 hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+                  <div>
+                    <span className="text-[0.65rem] font-bold uppercase tracking-widest text-gold block">
+                      01 / CHARACTER
+                    </span>
+                    <h3 className="mt-3 font-display text-xl font-bold text-foreground transition-colors group-hover:text-gold">
+                      Bespoke Identity
+                    </h3>
+                    <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      Every layout, typeface pairing, and spatial ratio is engineered from scratch for your brand. Zero rigid builder themes.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-white/[0.06] text-[0.72rem] font-semibold text-foreground/80 flex items-center gap-2">
+                    <CheckCircle2 className="size-3.5 text-gold shrink-0" />
+                    <span>100% Tailored Visual Craft</span>
+                  </div>
+                </div>
+              </Reveal>
+
+              <Reveal delay={120}>
+                <div className="group relative flex h-full flex-col justify-between rounded-[2.25rem] border border-white/[0.08] bg-charcoal/40 p-8 backdrop-blur-xl shadow-lg transition-all duration-400 hover:border-gold/50 hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+                  <div>
+                    <span className="text-[0.65rem] font-bold uppercase tracking-widest text-gold block">
+                      02 / SPEED
+                    </span>
+                    <h3 className="mt-3 font-display text-xl font-bold text-foreground transition-colors group-hover:text-gold">
+                      Pure Engineering
+                    </h3>
+                    <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      Clean React & TypeScript architecture delivering &lt; 1.2s Core Web Vitals. Zero sluggish plugin bloat or vulnerabilities.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-white/[0.06] text-[0.72rem] font-semibold text-foreground/80 flex items-center gap-2">
+                    <CheckCircle2 className="size-3.5 text-gold shrink-0" />
+                    <span>Sub-Second Google Vitals</span>
+                  </div>
+                </div>
+              </Reveal>
+
+              <Reveal delay={180}>
+                <div className="group relative flex h-full flex-col justify-between rounded-[2.25rem] border border-white/[0.08] bg-charcoal/40 p-8 backdrop-blur-xl shadow-lg transition-all duration-400 hover:border-gold/50 hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+                  <div>
+                    <span className="text-[0.65rem] font-bold uppercase tracking-widest text-gold block">
+                      03 / CONVERSION
+                    </span>
+                    <h3 className="mt-3 font-display text-xl font-bold text-foreground transition-colors group-hover:text-gold">
+                      Commercial Intent
+                    </h3>
+                    <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      Structured specifically for conversion. Clear client pathways, frictionless inquiry flows, and bank-grade checkout systems.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-white/[0.06] text-[0.72rem] font-semibold text-foreground/80 flex items-center gap-2">
+                    <CheckCircle2 className="size-3.5 text-gold shrink-0" />
+                    <span>Engineered for Inquiries</span>
+                  </div>
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
 
         {/* 3. Curated Selected Work (Preview) */}
         <section className="relative border-y border-white/[0.06] bg-gradient-to-b from-charcoal/40 via-background to-charcoal/30 py-24 sm:py-32 overflow-hidden">
@@ -272,6 +364,18 @@ function Index() {
                         <span>View In-Depth Case Study</span>
                         <ArrowRight className="size-3.5" />
                       </Link>
+
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[0.72rem] font-semibold text-emerald-400/90 hover:text-emerald-300 transition-colors"
+                        >
+                          <span>Live Demo</span>
+                          <ExternalLink className="size-3" />
+                        </a>
+                      )}
                     </div>
                   </article>
                 </Reveal>

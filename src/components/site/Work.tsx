@@ -71,6 +71,7 @@ export const projects: Project[] = [
     description:
       "Artisan culinary showcase featuring sensory photography, categorized digital menus, chef specials, and direct table reservations.",
     image: workUrbanEats,
+    liveUrl: "https://urban-eats-demo-mnw-three.vercel.app",
     technologies: ["React", "Sensory UI", "Digital Menu System", "Table Booking Flow"],
     overview:
       "Urban Eats is an artisan bistro concept designed to elevate dining reservations through sensory culinary visuals and minimal layout design.",
@@ -425,7 +426,7 @@ export function Work() {
                       </div>
 
                       {/* Case Study Trigger Button */}
-                      <div className="mt-8 pt-5 border-t border-white/[0.08] flex items-center gap-3">
+                      <div className="mt-8 pt-5 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3">
                         <button
                           type="button"
                           onClick={() => setActiveModalProject(project)}
@@ -434,6 +435,18 @@ export function Work() {
                           <span>Explore Case Study</span>
                           <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
                         </button>
+
+                        {project.liveUrl && (
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-xs font-semibold text-gold hover:bg-gold hover:text-primary-foreground transition-all duration-300"
+                          >
+                            <span>Launch Live Site</span>
+                            <ExternalLink className="size-3" />
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
