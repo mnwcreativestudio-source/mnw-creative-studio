@@ -21,7 +21,7 @@ import { Reveal } from "./Reveal";
 import { SectionHeading } from "./SectionHeading";
 import { createRazorpayOrder, verifyRazorpayPayment } from "@/lib/payment-server";
 import { launchRazorpayModal } from "@/lib/razorpay-checkout";
-import { getPlanDisplayINR } from "@/lib/razorpay-shared";
+import { getPlanDisplayINR, getPlanCheckoutTitle } from "@/lib/razorpay-shared";
 import { submitInquiry } from "@/lib/supabase";
 
 const STUDIO_EMAIL = "mnwcreativestudio@gmail.com";
@@ -55,12 +55,19 @@ const pricingPlans: Plan[] = [
     priceSubtext: "Fixed project investment",
     defaultProjectType: "Starter Website (Up to 5 Pages)",
     features: [
-      "Professional responsive website",
       "Up to 5 pages",
-      "Mobile-friendly design",
-      "Contact form",
+      "Premium responsive website design",
+      "Custom modern UI",
+      "WhatsApp integration",
+      "Contact / enquiry form",
       "Basic SEO setup",
-      "Performance optimization",
+      "Google Maps integration",
+      "Social media integration",
+      "Basic animations",
+      "Custom domain setup",
+      "SSL / HTTPS setup",
+      "Website deployment",
+      "2 revision rounds",
     ],
     highlighted: false,
   },
@@ -77,12 +84,21 @@ const pricingPlans: Plan[] = [
     priceSubtext: "Most popular choice for brands",
     defaultProjectType: "Professional Custom Website (Up to 10 Pages)",
     features: [
-      "Everything in Starter",
       "Up to 10 pages",
-      "Premium custom design",
+      "Fully custom premium UI/UX",
+      "Advanced responsive design",
+      "Advanced animations and interactions",
       "Advanced SEO setup",
-      "WhatsApp and social integration",
-      "Conversion-focused sections",
+      "WhatsApp integration",
+      "Contact / enquiry system",
+      "Email OTP verification",
+      "Razorpay payment gateway integration",
+      "Google Maps integration",
+      "Social media integration",
+      "Custom domain setup",
+      "SSL / HTTPS setup",
+      "Production deployment",
+      "4 revision rounds",
       "Priority support",
     ],
     highlighted: true,
@@ -663,6 +679,16 @@ export function Plans() {
                   Timely provision of brand assets, copy, and media helps ensure all planned milestones are met on schedule.
                 </p>
               </div>
+
+              <div className="rounded-2xl border border-gold/40 bg-gold/5 p-4 sm:col-span-2 lg:col-span-3">
+                <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-gold" />
+                  Third-Party Services & Payment Gateway Charges
+                </h5>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                  Third-party services and recurring charges are not included in the package price. Domain registration, hosting, payment gateway charges, email services, premium APIs, software subscriptions and other third-party services are billed separately where applicable. Final pricing may vary depending on project scope, integrations and custom requirements. Razorpay payment gateway transaction charges are charged by the payment provider and are not included in the website development fee.
+                </p>
+              </div>
             </div>
           </div>
         </Reveal>
@@ -1167,38 +1193,63 @@ export function Plans() {
                     </div>
 
                     {/* Plan & Amount Summary */}
-                    <div className="mt-6 rounded-2xl border border-gold/30 bg-background/60 p-5">
+                    <div className="mt-6 rounded-2xl border border-gold/40 bg-background/70 p-5 shadow-[0_15px_35px_rgba(0,0,0,0.5)]">
                       <div className="flex items-center justify-between border-b border-border/50 pb-3">
-                        <span className="text-xs text-muted-foreground">Selected Plan</span>
-                        <span className="font-display text-base font-bold text-foreground">
-                          {selectedPlan.name}
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Selected Website Plan
+                        </span>
+                        <span className="font-display text-base font-extrabold text-foreground">
+                          {getPlanCheckoutTitle(selectedPlan.name)}
                         </span>
                       </div>
 
-                      <div className="flex items-baseline justify-between pt-3">
-                        <span className="text-xs text-muted-foreground">USD Price</span>
-                        <div className="flex items-baseline gap-2 text-right">
-                          <span className="font-display text-2xl sm:text-3xl font-extrabold text-gold">
-                            {selectedPlan.priceUSD}
-                          </span>
-                          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                            USD
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Display fixed INR conversion amount for India & Razorpay */}
+                      {/* Prominent India / Razorpay Amount Display */}
                       {getPlanDisplayINR(selectedPlan.name) && (
-                        <div className="mt-3 flex items-center justify-between rounded-xl bg-charcoal/60 px-3.5 py-2.5 border border-border/60">
-                          <span className="text-xs font-medium text-muted-foreground">
-                            Razorpay INR Amount
-                          </span>
-                          <span className="text-xs sm:text-sm font-bold text-foreground">
-                            {getPlanDisplayINR(selectedPlan.name)} INR
-                            {selectedPlan.isCustomPriced ? " starting amount" : ""}
-                          </span>
+                        <div className="my-3.5 rounded-xl border border-gold/40 bg-gradient-to-r from-gold/15 via-gold/10 to-transparent p-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+                            <div>
+                              <span className="block font-display text-base sm:text-lg font-bold text-foreground">
+                                {getPlanCheckoutTitle(selectedPlan.name)}
+                              </span>
+                              <span className="text-[0.68rem] font-semibold uppercase tracking-wider text-gold">
+                                Payable Development Fee
+                              </span>
+                            </div>
+                            <div className="sm:text-right">
+                              <span className="font-display text-2xl sm:text-3xl font-extrabold text-gold tracking-tight">
+                                Amount: {getPlanDisplayINR(selectedPlan.name)}
+                              </span>
+                              <span className="block text-[0.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+                                INR (Indian Rupees)
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       )}
+
+                      {/* International USD Price Reference */}
+                      <div className="flex items-baseline justify-between pt-1 text-xs text-muted-foreground">
+                        <span>International Reference</span>
+                        <div className="flex items-baseline gap-1.5 text-right font-medium">
+                          <span>{selectedPlan.priceUSD} USD</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Third-Party Services & Payment Gateway Charges Notice */}
+                    <div className="mt-3.5 rounded-xl border border-border/70 bg-charcoal/50 p-3.5 text-[0.72rem] leading-relaxed text-muted-foreground space-y-1.5">
+                      <p className="font-medium text-foreground/90">
+                        Third-party services and recurring charges are not included in the package price.
+                      </p>
+                      <p>
+                        Domain registration, hosting, payment gateway charges, email services, premium APIs, software subscriptions and other third-party services are billed separately where applicable.
+                      </p>
+                      <p>
+                        Final pricing may vary depending on project scope, integrations and custom requirements.
+                      </p>
+                      <p className="border-t border-border/40 pt-1.5 text-gold/90 font-medium">
+                        Razorpay payment gateway transaction charges are charged by the payment provider and are not included in the website development fee.
+                      </p>
                     </div>
 
                     {/* Error Notice (if failed) */}
