@@ -3,6 +3,17 @@ import fs from "node:fs";
 import path from "node:path";
 import { getSupabase } from "./supabase";
 
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      RESEND_API_KEY?: string;
+      RESEND_FROM_EMAIL?: string;
+      INQUIRY_VERIFICATION_SECRET?: string;
+      RAZORPAY_KEY_SECRET?: string;
+    }
+  }
+}
+
 export type SendOtpInput = {
   email: string;
   name?: string;
@@ -73,11 +84,30 @@ function normalizeEmail(email?: string | null): string {
   return typeof email === "string" ? email.trim().toLowerCase() : "";
 }
 
-function getEnvValue(name: string, envObj: Record<string, string>): string {
-  if (envObj[name]) return envObj[name];
-  if (typeof process !== "undefined" && process.env && process.env[name]) return process.env[name] as string;
+/**
+ * Safely resolves the server-side RESEND_API_KEY from process.env.RESEND_API_KEY.
+ * Strictly adheres to reading process.env.RESEND_API_KEY without client-side variables or prefixes.
+ * Never exposes or logs the secret key.
+ */
+function getResendApiKey(env?: unknown): string {
+  // 1. Primary: direct process.env.RESEND_API_KEY (Node.js runtime / Vercel Serverless environment)
+  if (typeof process !== "undefined" && process.env) {
+    const procEnv = process.env as Record<string, string | undefined>;
+    const val = procEnv["RESEND_API_KEY"];
+    if (val && typeof val === "string" && val.trim().length > 0) {
+      return val.trim();
+    }
+  }
 
-  // Local development fallback: parse .env if process.env does not have it yet
+  // 2. Server runtime env parameter (if supplied by host framework)
+  if (env && typeof env === "object" && "RESEND_API_KEY" in env) {
+    const val = (env as Record<string, unknown>)["RESEND_API_KEY"];
+    if (typeof val === "string" && val.trim().length > 0) {
+      return val.trim();
+    }
+  }
+
+  // 3. Local development fallback: parse .env if process.env is not yet populated
   try {
     const envPath = path.resolve(process.cwd(), ".env");
     if (fs.existsSync(envPath)) {
@@ -86,8 +116,9 @@ function getEnvValue(name: string, envObj: Record<string, string>): string {
         const trimmed = line.trim();
         if (trimmed.startsWith("#") || !trimmed.includes("=")) continue;
         const [k, ...v] = trimmed.split("=");
-        if (k && k.trim() === name) {
-          return v.join("=").trim().replace(/^["']|["']$/g, "");
+        if (k && k.trim() === "RESEND_API_KEY") {
+          const parsed = v.join("=").trim().replace(/^["']|["']$/g, "");
+          if (parsed) return parsed;
         }
       }
     }
@@ -100,35 +131,20 @@ function getEnvValue(name: string, envObj: Record<string, string>): string {
 
 /**
  * Returns server secrets for Resend and cryptographic verification.
+ * Adheres strictly to reading process.env.RESEND_API_KEY.
  */
 function getServerConfig(env?: unknown) {
-  const envObj = (env as Record<string, string> | undefined) || {};
-
-  let resendApiKey =
-    getEnvValue("RESEND_API_KEY", envObj) ||
-    getEnvValue("VITE_RESEND_API_KEY", envObj) ||
-    getEnvValue("RESEND_KEY", envObj) ||
-    getEnvValue("RESEND_TOKEN", envObj) ||
-    getEnvValue("RESEND_API_TOKEN", envObj) ||
-    getEnvValue("RESEND_SECRET", envObj);
-
-  if (!resendApiKey && typeof process !== "undefined" && process.env) {
-    for (const [k, v] of Object.entries(process.env)) {
-      if (/resend/i.test(k) && typeof v === "string" && v.trim().startsWith("re_")) {
-        resendApiKey = v.trim();
-        break;
-      }
-    }
-  }
+  const resendApiKey = getResendApiKey(env);
+  const procEnv = (typeof process !== "undefined" && process.env ? process.env : {}) as Record<string, string | undefined>;
 
   const resendFromEmail =
-    getEnvValue("RESEND_FROM_EMAIL", envObj) ||
+    procEnv["RESEND_FROM_EMAIL"] ||
+    (env && typeof env === "object" && typeof (env as Record<string, unknown>)["RESEND_FROM_EMAIL"] === "string" ? ((env as Record<string, unknown>)["RESEND_FROM_EMAIL"] as string) : "") ||
     "MNW Creative Studio <contact@mnwcreativestudio.in>";
 
-  // Cryptographic server secret for signing verification tokens
   const serverSecret =
-    getEnvValue("INQUIRY_VERIFICATION_SECRET", envObj) ||
-    getEnvValue("RAZORPAY_KEY_SECRET", envObj) ||
+    procEnv["INQUIRY_VERIFICATION_SECRET"] ||
+    procEnv["RAZORPAY_KEY_SECRET"] ||
     "mnw-studio-inquiry-secret-salt-2026";
 
   return { resendApiKey, resendFromEmail, serverSecret };
@@ -244,6 +260,9 @@ export async function sendInquiryOtp(
   }
 
   const { resendApiKey, resendFromEmail, serverSecret } = getServerConfig(env);
+
+  // Safe server-side diagnostics: logs boolean status only, never exposes actual secret
+  console.log(`[InquiryServer] sendInquiryOtp request: recipient=${email}, RESEND_API_KEY configured=${Boolean(resendApiKey)}`);
 
   const now = Date.now();
 
