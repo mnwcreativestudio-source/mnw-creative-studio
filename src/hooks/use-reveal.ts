@@ -9,11 +9,6 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(threshold = 0.
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Enable progressive enhancement class on document once client JS is running
-    if (typeof document !== "undefined" && !document.documentElement.classList.contains("js-active")) {
-      document.documentElement.classList.add("js-active");
-    }
-
     const node = ref.current;
     if (!node) return;
 
@@ -27,9 +22,9 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(threshold = 0.
       return;
     }
 
-    // Immediately display elements already within or near the current viewport
+    // Immediately display elements already within the current viewport on mount
     const rect = node.getBoundingClientRect();
-    if (rect.top < window.innerHeight + 120 && rect.bottom > -50) {
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
       setVisible(true);
       return;
     }
@@ -43,11 +38,20 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(threshold = 0.
           }
         });
       },
-      { threshold, rootMargin: "120px 0px 120px 0px" },
+      { threshold, rootMargin: "0px 0px 60px 0px" },
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    // Safety fallback: ensure element reveals even on browsers with delayed/stalled intersection events
+    const timer = setTimeout(() => {
+      setVisible(true);
+    }, 1200);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [threshold]);
 
   return { ref, visible };

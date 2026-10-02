@@ -249,32 +249,34 @@
 
 
 @utility reveal {
-  /* Visible by default during SSR and initial HTML paint */
+  /* 100% visible by default during SSR and on mobile paint - prevents blank screen */
   opacity: 1;
   transform: none;
 }
 
-/* Progressive enhancement: animated entrance once client JS is active */
-.js-active .reveal:not(.reveal-in) {
-  opacity: 0;
-  transform: translateY(20px);
-  transition:
-    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.js-active .reveal.reveal-in {
+@utility reveal-in {
   opacity: 1;
   transform: none;
+  animation: reveal-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes reveal-enter {
+  from {
+    opacity: 0.15;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .reveal-in,
-  .js-active .reveal,
-  .js-active .reveal-in {
+  .reveal-in {
     opacity: 1 !important;
     transform: none !important;
+    animation: none !important;
     transition: none !important;
   }
 }
