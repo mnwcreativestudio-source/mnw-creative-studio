@@ -1,4 +1,5 @@
-import { MessageSquareQuote } from "lucide-react";
+import { ShieldCheck, BarChart3, Users2, Sparkles, ArrowRight, Lock } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Reveal } from "./Reveal";
 import { SectionHeading } from "./SectionHeading";
 
@@ -11,7 +12,7 @@ export type Testimonial = {
   rating?: number;
 };
 
-// Ready for verified client testimonials as ongoing projects are completed
+// Ready for verified client testimonials as ongoing projects reach publication milestones
 const verifiedTestimonials: Testimonial[] = [];
 
 export function Testimonials() {
@@ -19,14 +20,14 @@ export function Testimonials() {
     <section id="testimonials" className="relative border-t border-white/[0.06] bg-gradient-to-b from-background via-charcoal/20 to-background py-24 sm:py-32 overflow-hidden">
       {/* Ambient lighting */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-1/2 left-1/2 size-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.03] blur-[150px]" />
+        <div className="absolute top-1/2 left-1/2 size-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.035] blur-[160px]" />
       </div>
 
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <SectionHeading
-          eyebrow="Client Stories"
-          title="What Our Clients Say"
-          description="Real feedback and authentic experiences from businesses we collaborate with."
+          eyebrow="Client Partnerships"
+          title="Verified Client Stories"
+          description="We prioritize authentic outcomes and client confidentiality over unverified testimonials."
         />
 
         {verifiedTestimonials.length > 0 ? (
@@ -46,32 +47,91 @@ export function Testimonials() {
             ))}
           </div>
         ) : (
-          /* Professional authentic state (No fake testimonials) */
-          <Reveal className="mt-14">
-            <div className="relative overflow-hidden mx-auto max-w-2xl rounded-[2.5rem] border border-gold/35 bg-gradient-to-b from-charcoal/90 via-charcoal/60 to-charcoal/40 p-9 sm:p-12 text-center shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_30px_rgba(212,175,55,0.12)] backdrop-blur-2xl">
-              {/* Subtle top rim light */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent"
-              />
+          /* Prestigious, intentional verification & confidentiality showcase */
+          <div className="mt-16">
+            <Reveal>
+              <div className="relative overflow-hidden mx-auto max-w-4xl rounded-[2.5rem] border border-gold/40 bg-gradient-to-b from-charcoal/90 via-charcoal/70 to-charcoal/50 p-8 sm:p-12 lg:p-14 text-center shadow-[0_30px_90px_rgba(0,0,0,0.9),0_0_35px_rgba(212,175,55,0.12)] backdrop-blur-2xl">
+                {/* Top rim accent */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent"
+                />
 
-              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-gold/40 bg-gold/15 text-gold shadow-[0_0_25px_rgba(212,175,55,0.25)]">
-                <MessageSquareQuote className="size-7" />
+                <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-gold/40 bg-gold/15 text-gold shadow-[0_0_25px_rgba(212,175,55,0.25)]">
+                  <ShieldCheck className="size-7" />
+                </div>
+
+                <span className="mt-6 inline-block text-[0.7rem] font-bold uppercase tracking-[0.25em] text-gold">
+                  Client Confidentiality & Verified Outcomes
+                </span>
+
+                <h3 className="mt-3 font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground">
+                  In-Depth Client Case Studies in Progress
+                </h3>
+
+                <p className="mx-auto mt-4 max-w-2xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                  We treat client commercial goals with the highest level of professionalism and confidentiality.
+                  Detailed post-launch case studies, conversion metrics, and verified feedback from our active
+                  client cohort are compiled and published only after formal post-launch review.
+                </p>
+
+                {/* 3 Pillars of Client Integrity */}
+                <div className="mt-10 grid gap-4 sm:grid-cols-3 text-left">
+                  <div className="rounded-2xl border border-white/[0.08] bg-black/40 p-5 backdrop-blur-md">
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-gold/10 text-gold border border-gold/20 mb-3">
+                      <Lock className="size-4" />
+                    </span>
+                    <h4 className="font-display text-xs sm:text-sm font-bold text-foreground">
+                      Strict NDA & Privacy
+                    </h4>
+                    <p className="mt-1.5 text-[0.72rem] text-muted-foreground leading-relaxed">
+                      Commercial launch timelines and sensitive business logic remain completely confidential.
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/[0.08] bg-black/40 p-5 backdrop-blur-md">
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-gold/10 text-gold border border-gold/20 mb-3">
+                      <BarChart3 className="size-4" />
+                    </span>
+                    <h4 className="font-display text-xs sm:text-sm font-bold text-foreground">
+                      Audited Performance
+                    </h4>
+                    <p className="mt-1.5 text-[0.72rem] text-muted-foreground leading-relaxed">
+                      We publish real telemetry, Core Web Vitals, and measurable business inquiries, not vanity quotes.
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/[0.08] bg-black/40 p-5 backdrop-blur-md">
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-gold/10 text-gold border border-gold/20 mb-3">
+                      <Users2 className="size-4" />
+                    </span>
+                    <h4 className="font-display text-xs sm:text-sm font-bold text-foreground">
+                      Direct Senior Craft
+                    </h4>
+                    <p className="mt-1.5 text-[0.72rem] text-muted-foreground leading-relaxed">
+                      Every project is led directly by studio founders with dedicated communication and care.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-10 pt-6 border-t border-white/[0.08] flex flex-wrap items-center justify-center gap-4">
+                  <Link
+                    to="/contact"
+                    className="group inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95"
+                  >
+                    <span>Discuss Your Project With Us</span>
+                    <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </Link>
+                  <Link
+                    to="/work"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-xs sm:text-sm font-semibold text-foreground transition-all hover:border-gold hover:text-gold"
+                  >
+                    <span>Inspect Our Work Showcase</span>
+                  </Link>
+                </div>
               </div>
-
-              <span className="mt-6 inline-block text-[0.7rem] font-bold uppercase tracking-[0.25em] text-gold">
-                Authentic Partnerships
-              </span>
-
-              <h3 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-foreground">
-                Client Stories Coming Soon
-              </h3>
-
-              <p className="mx-auto mt-3.5 max-w-lg text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                Real client testimonials and project stories will appear here as completed projects and verified feedback become available.
-              </p>
-            </div>
-          </Reveal>
+            </Reveal>
+          </div>
         )}
       </div>
     </section>

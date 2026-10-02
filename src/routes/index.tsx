@@ -142,83 +142,146 @@ function Index() {
               </Link>
             </div>
 
-            {/* 3 Featured Project Cards */}
-            <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredProjects.map((project, i) => (
-                <Reveal key={project.id} delay={i * 80}>
-                  <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[2rem] border border-white/[0.08] bg-charcoal/40 backdrop-blur-xl p-3 transition-all duration-500 hover:-translate-y-2 hover:border-gold/50 hover:shadow-[0_22px_55px_rgba(0,0,0,0.85),0_0_30px_rgba(212,175,55,0.15)]">
-                    <div className="flex flex-col flex-1">
-                      <div className="relative aspect-[16/10.5] overflow-hidden rounded-[1.5rem] bg-charcoal/90 border border-white/[0.05]">
-                        <img
-                          src={project.image}
-                          loading="lazy"
-                          width={800}
-                          height={525}
-                          alt={`Preview of ${project.name}`}
-                          className="size-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-60" />
+            {/* Featured Live Spotlight Case: W Dental Clinic */}
+            <Reveal className="mt-14">
+              <div className="group relative overflow-hidden rounded-[2.5rem] border border-gold/40 bg-gradient-to-b from-charcoal/90 via-charcoal/70 to-charcoal/50 p-6 sm:p-10 shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9),0_0_35px_rgba(212,175,55,0.12)] backdrop-blur-2xl transition-all duration-500 hover:border-gold/60">
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent"
+                />
 
-                        <div className="absolute top-3.5 right-3.5">
-                          {project.status === "Live Project" ? (
-                            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-950/90 border border-emerald-400/60 px-3 py-1 text-[0.68rem] font-extrabold tracking-wider text-emerald-300 shadow-[0_0_16px_rgba(52,211,153,0.35)] backdrop-blur-md uppercase">
-                              <span className="size-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-                              LIVE PROJECT
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-charcoal/85 border border-white/[0.08] px-2.5 py-1 text-[0.65rem] font-semibold tracking-wider text-muted-foreground backdrop-blur-md uppercase">
-                              DEMO PROJECT
-                            </span>
-                          )}
+                <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
+                  <div className="lg:col-span-7">
+                    <div className="overflow-hidden rounded-[1.75rem] border border-gold/30 bg-black/80 shadow-2xl">
+                      <div className="flex items-center justify-between border-b border-white/[0.08] bg-charcoal/90 px-4 py-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="size-2 rounded-full bg-rose-500/80" />
+                          <span className="size-2 rounded-full bg-amber-500/80" />
+                          <span className="size-2 rounded-full bg-emerald-500/80" />
                         </div>
+                        <div className="flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-black/40 px-3 py-0.5 text-[0.62rem] text-muted-foreground font-mono">
+                          <span className="size-1.5 rounded-full bg-emerald-400" />
+                          <span>wi-dental-clinic.vercel.app</span>
+                        </div>
+                        <div className="w-8" />
+                      </div>
+                      <div className="relative aspect-[16/10] overflow-hidden">
+                        <img
+                          src={featuredProjects[0].image}
+                          alt="W Dental Clinic healthcare website by MNW Creative Studio"
+                          className="size-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                        <div className="absolute bottom-3 left-3.5">
-                          <span className="inline-block rounded-full bg-black/60 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-gold backdrop-blur-md border border-gold/30 shadow-sm">
-                            {project.category}
-                          </span>
+                  <div className="lg:col-span-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-950/90 border border-emerald-400/60 px-3.5 py-1 text-[0.7rem] font-extrabold tracking-wider text-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.35)]">
+                        <span className="size-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+                        FEATURED LIVE CLIENT WORK
+                      </span>
+                      <span className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-gold">
+                        {featuredProjects[0].category}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-4 font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground tracking-tight">
+                      {featuredProjects[0].name}
+                    </h3>
+
+                    <p className="mt-3 text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                      {featuredProjects[0].description}
+                    </p>
+
+                    <div className="mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-white/[0.08]">
+                      <Link
+                        to="/work"
+                        className="group inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-xs font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95"
+                      >
+                        <span>Inspect Case Study</span>
+                        <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                      </Link>
+
+                      {featuredProjects[0].liveUrl && (
+                        <a
+                          href={featuredProjects[0].liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-3 text-xs font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all"
+                        >
+                          <span>Launch Live Site</span>
+                          <ExternalLink className="size-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Alternating Highlights: Urban Eats & Luxury Real Estate */}
+            <div className="mt-10 grid gap-8 md:grid-cols-2">
+              {featuredProjects.slice(1).map((project, i) => (
+                <Reveal key={project.id} delay={i * 80}>
+                  <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[2.25rem] border border-white/[0.08] bg-charcoal/45 p-6 backdrop-blur-xl shadow-lg transition-all duration-500 hover:border-gold/45 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+                    <div>
+                      <div className="overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-black/60">
+                        <div className="flex items-center justify-between border-b border-white/[0.06] bg-charcoal/80 px-3 py-1.5">
+                          <div className="flex items-center gap-1">
+                            <span className="size-1.5 rounded-full bg-rose-500/80" />
+                            <span className="size-1.5 rounded-full bg-amber-500/80" />
+                            <span className="size-1.5 rounded-full bg-emerald-500/80" />
+                          </div>
+                          <span className="text-[0.6rem] font-mono text-muted-foreground">{project.id}</span>
+                          <div className="w-4" />
+                        </div>
+                        <div className="relative aspect-[16/10] overflow-hidden">
+                          <img
+                            src={project.image}
+                            loading="lazy"
+                            alt={`Preview of ${project.name}`}
+                            className="size-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                          />
                         </div>
                       </div>
 
-                      <div className="p-5 flex flex-col flex-1">
-                        <h3 className="font-display text-lg sm:text-xl font-bold text-foreground transition-colors duration-300 group-hover:text-gold">
+                      <div className="mt-5">
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wider text-gold">
+                            {project.category}
+                          </span>
+                          <span className="text-[0.62rem] text-muted-foreground uppercase font-semibold">
+                            {project.status}
+                          </span>
+                        </div>
+                        <h4 className="mt-3 font-display text-xl font-bold text-foreground group-hover:text-gold transition-colors">
                           {project.name}
-                        </h3>
-                        <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground line-clamp-2">
+                        </h4>
+                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                           {project.description}
                         </p>
                       </div>
                     </div>
 
-                    <div className="px-5 pb-3 pt-3 border-t border-white/[0.06] flex items-center justify-between gap-2 mt-auto">
+                    <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between">
                       <Link
                         to="/work"
-                        className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-foreground transition-all duration-300 hover:text-gold"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-gold hover:text-gold-soft transition-colors"
                       >
-                        <span>Explore Case Study</span>
-                        <ArrowRight className="size-3.5 text-gold" />
+                        <span>View In-Depth Case Study</span>
+                        <ArrowRight className="size-3.5" />
                       </Link>
-
-                      {project.liveUrl && (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-[0.72rem] font-semibold text-emerald-400 hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 transition-all duration-300"
-                        >
-                          <span>Live Site</span>
-                          <ExternalLink className="size-3" />
-                        </a>
-                      )}
                     </div>
                   </article>
                 </Reveal>
               ))}
             </div>
 
-            <div className="mt-12 text-center">
+            <div className="mt-14 text-center">
               <Link
                 to="/work"
-                className="group inline-flex items-center gap-2.5 rounded-full border border-gold/50 bg-gold/5 px-8 py-4 text-sm font-bold text-gold transition-all duration-300 hover:bg-gold hover:text-primary-foreground hover:shadow-[var(--shadow-gold)]"
+                className="group inline-flex items-center gap-2.5 rounded-full border border-gold/50 bg-gold/10 px-8 py-4 text-sm font-bold text-gold transition-all duration-300 hover:bg-gold hover:text-primary-foreground hover:shadow-[var(--shadow-gold)]"
               >
                 <span>Explore Full Portfolio & All 6 Case Studies</span>
                 <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />

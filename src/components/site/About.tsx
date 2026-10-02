@@ -1,27 +1,36 @@
-import { CheckCircle2, Sparkles, HeartHandshake, Eye, MessageSquare, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  Sparkles,
+  HeartHandshake,
+  Eye,
+  MessageSquare,
+  ShieldCheck,
+  ArrowRight,
+} from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import aboutWorkspace from "@/assets/about-workspace.jpg";
 import { Reveal } from "./Reveal";
 
 const values = [
   {
     icon: HeartHandshake,
-    title: "Client-Focused Approach",
-    desc: "Every design decision is shaped around your unique business goals, target audience, and market position.",
+    title: "Client-Centered Collaboration",
+    desc: "Every design choice and architectural decision is shaped around your commercial goals, target audience, and long-term brand equity.",
   },
   {
     icon: Eye,
-    title: "Modern & Clean Design",
-    desc: "Refined aesthetic sensibilities, balanced typography, and clean visual hierarchy that instills immediate trust.",
+    title: "Aesthetic Restraint & Polish",
+    desc: "Refined typographic hierarchy, balanced contrast, and intentional white space that establishes immediate credibility and visual luxury.",
   },
   {
     icon: MessageSquare,
-    title: "Reliable Communication",
-    desc: "Transparent timelines, structured milestones, and proactive updates so you're always informed.",
+    title: "Transparent Milestones",
+    desc: "Direct communication with the creators building your site. Structured weekly demos, clear revision rounds, and zero jargon.",
   },
   {
     icon: ShieldCheck,
-    title: "Long-Term Support",
-    desc: "We stand behind our code with ongoing assistance, technical updates, and guidance as your business grows.",
+    title: "Enduring Technical Support",
+    desc: "We stand firmly behind our code with post-launch verification, performance monitoring, and dependable guidance as your business expands.",
   },
 ];
 
@@ -30,12 +39,12 @@ export function About() {
     <section id="about" className="relative border-y border-white/[0.06] bg-gradient-to-b from-charcoal/40 via-background to-charcoal/30 py-24 sm:py-32 overflow-hidden">
       {/* Ambient background light */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-1/2 left-1/4 size-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.03] blur-[150px]" />
+        <div className="absolute top-1/2 left-1/4 size-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.035] blur-[160px]" />
       </div>
 
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-16 items-center">
-          {/* Left Column: Story & Values */}
+          {/* Left Column: Editorial Studio Story & Values */}
           <div>
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1 text-[0.7rem] font-bold tracking-[0.25em] text-gold uppercase shadow-[0_0_12px_rgba(212,175,55,0.15)]">
@@ -43,22 +52,32 @@ export function About() {
                 About MNW Creative Studio
               </span>
 
-              <h2 className="mt-5 font-display text-3xl font-extrabold text-balance sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
+              <h2 className="mt-5 font-display text-3xl font-extrabold text-balance sm:text-4xl lg:text-[2.85rem] lg:leading-[1.12]">
                 Digital Experiences,{" "}
                 <span className="text-gold-gradient">Built With Purpose.</span>
               </h2>
 
               <div className="mt-6 space-y-4 text-sm sm:text-base leading-relaxed text-muted-foreground">
                 <p>
-                  <strong className="text-foreground font-semibold">Who We Are: </strong>
-                  MNW Creative Studio is an independent web design and development studio focused on
-                  creating modern, responsive and purposeful digital experiences for businesses.
+                  <strong className="text-foreground font-semibold">Our Studio Philosophy: </strong>
+                  MNW Creative Studio is an independent web design and engineering practice dedicated to
+                  building bespoke, high-performing websites for ambitious businesses and professionals.
                 </p>
                 <p>
-                  We collaborate with businesses, brands, and service professionals who value craftsmanship,
-                  clarity, and dependable execution. Rather than relying on generic templates, we craft bespoke
-                  web solutions that look exceptional and perform reliably on every device.
+                  We believe modern businesses deserve far better than sluggish, generic page builder themes.
+                  By merging sculptural typography and thoughtful UI/UX with modern React & TypeScript engineering,
+                  we create digital products that look exceptional and perform effortlessly on every screen.
                 </p>
+              </div>
+
+              <div className="mt-6">
+                <Link
+                  to="/about"
+                  className="group inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-gold transition-colors hover:text-gold-soft"
+                >
+                  <span>Explore Our Full Studio Profile & Standards</span>
+                  <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
               </div>
             </Reveal>
 
@@ -66,7 +85,7 @@ export function About() {
             <div className="mt-10 grid gap-4 sm:grid-cols-2">
               {values.map((val, i) => (
                 <Reveal key={val.title} delay={i * 60}>
-                  <div className="rounded-[1.5rem] border border-white/[0.08] bg-charcoal/40 backdrop-blur-xl p-5 transition-all duration-300 hover:border-gold/40 hover:bg-charcoal/70 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
+                  <div className="rounded-[1.75rem] border border-white/[0.08] bg-charcoal/45 backdrop-blur-xl p-5 transition-all duration-300 hover:border-gold/40 hover:bg-charcoal/70 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
                     <div className="flex items-center gap-3">
                       <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gold/10 text-gold border border-gold/25 shadow-[0_0_12px_rgba(212,175,55,0.12)]">
                         <val.icon className="size-4" />
@@ -84,17 +103,17 @@ export function About() {
             </div>
           </div>
 
-          {/* Right Column: Studio Workspace Photography */}
+          {/* Right Column: Studio Workspace Photography with Beveled Glass */}
           <Reveal delay={120} className="relative">
             <div
               aria-hidden
-              className="absolute -inset-6 -z-10 rounded-[3rem] bg-gold/10 blur-3xl opacity-70"
+              className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-tr from-gold/15 via-gold-deep/10 to-transparent blur-3xl opacity-75"
             />
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.1] bg-charcoal/60 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.9),0_0_40px_rgba(212,175,55,0.15)] backdrop-blur-2xl">
+            <div className="relative overflow-hidden rounded-[2.5rem] border border-gold/30 bg-charcoal/70 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.9),0_0_40px_rgba(212,175,55,0.15)] backdrop-blur-2xl">
               {/* Top rim accent */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"
+                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent"
               />
 
               <div className="overflow-hidden rounded-[2rem] bg-charcoal/90 relative">
@@ -116,7 +135,7 @@ export function About() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[0.68rem] uppercase tracking-wider text-gold font-bold">
                   <Sparkles className="size-2.5 text-gold" />
-                  Bespoke Craft
+                  Bespoke Craftsmanship
                 </span>
               </div>
             </div>
