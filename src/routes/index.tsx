@@ -76,6 +76,8 @@ const featuredProjects = [
   },
 ];
 
+const primaryFeaturedProject = featuredProjects[0]!;
+
 const coreCapabilities = [
   {
     icon: Layers,
@@ -259,7 +261,7 @@ function Index() {
                       </div>
                       <div className="relative aspect-[16/10] overflow-hidden">
                         <img
-                          src={featuredProjects[0].image}
+                          src={primaryFeaturedProject.image}
                           alt="W Dental Clinic healthcare website by MNW Creative Studio"
                           className="size-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                         />
@@ -274,16 +276,16 @@ function Index() {
                         FEATURED LIVE CLIENT WORK
                       </span>
                       <span className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-gold">
-                        {featuredProjects[0].category}
+                        {primaryFeaturedProject.category}
                       </span>
                     </div>
 
                     <h3 className="mt-4 font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground tracking-tight">
-                      {featuredProjects[0].name}
+                      {primaryFeaturedProject.name}
                     </h3>
 
                     <p className="mt-3 text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                      {featuredProjects[0].description}
+                      {primaryFeaturedProject.description}
                     </p>
 
                     <div className="mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-white/[0.08]">
@@ -295,9 +297,9 @@ function Index() {
                         <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                       </Link>
 
-                      {featuredProjects[0].liveUrl && (
+                      {primaryFeaturedProject.liveUrl && (
                         <a
-                          href={featuredProjects[0].liveUrl}
+                          href={primaryFeaturedProject.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-3 text-xs font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all"

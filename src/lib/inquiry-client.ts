@@ -28,9 +28,8 @@ export const DISPOSABLE_EMAIL_DOMAINS = new Set([
  */
 export function isDisposableEmail(email: string): boolean {
   const parts = email.trim().toLowerCase().split("@");
-  if (parts.length !== 2) return false;
-  const domain = parts[1];
-  return DISPOSABLE_EMAIL_DOMAINS.has(domain);
+  if (parts.length !== 2 || !parts[1]) return false;
+  return DISPOSABLE_EMAIL_DOMAINS.has(parts[1]);
 }
 
 export type RequestOtpResponse = {

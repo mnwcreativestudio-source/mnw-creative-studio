@@ -19,5 +19,5 @@ export default defineConfig({
         runtime: "nodejs22.x",
       },
     },
-  },
+  } as any,
 });

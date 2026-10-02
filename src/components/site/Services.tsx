@@ -92,6 +92,9 @@ export const services = [
 ];
 
 export function Services() {
+  const designService = services[0]!;
+  const engineeringService = services[1]!;
+
   return (
     <section id="services" className="relative py-24 sm:py-32 overflow-hidden">
       {/* Ambient background lighting */}
@@ -139,10 +142,10 @@ export function Services() {
                   </div>
 
                   <h3 className="mt-7 font-display text-2xl sm:text-3xl font-extrabold text-foreground">
-                    {services[0].title}
+                    {designService.title}
                   </h3>
                   <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted-foreground">
-                    {services[0].text}
+                    {designService.text}
                   </p>
 
                   {/* Visual Token Preview Accent */}
@@ -165,7 +168,7 @@ export function Services() {
 
                   {/* Deliverables */}
                   <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
-                    {services[0].deliverables.map((item, idx) => (
+                    {designService.deliverables.map((item, idx) => (
                       <li key={idx} className="flex items-center gap-2 text-xs text-foreground/85">
                         <CheckCircle2 className="size-3.5 text-gold shrink-0" />
                         <span>{item}</span>
@@ -197,10 +200,10 @@ export function Services() {
                   </div>
 
                   <h3 className="mt-7 font-display text-2xl sm:text-3xl font-extrabold text-foreground">
-                    {services[1].title}
+                    {engineeringService.title}
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {services[1].text}
+                    {engineeringService.text}
                   </p>
 
                   {/* Code Snippet Accent */}
@@ -220,7 +223,7 @@ export function Services() {
 
                   {/* Deliverables */}
                   <ul className="mt-6 space-y-2">
-                    {services[1].deliverables.slice(0, 3).map((item, idx) => (
+                    {engineeringService.deliverables.slice(0, 3).map((item, idx) => (
                       <li key={idx} className="flex items-center gap-2 text-xs text-foreground/85">
                         <CheckCircle2 className="size-3.5 text-gold shrink-0" />
                         <span>{item}</span>

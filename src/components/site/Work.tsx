@@ -189,7 +189,7 @@ export const projects: Project[] = [
 export function Work() {
   const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
 
-  const featuredLiveProject = projects[0]; // W Dental Clinic
+  const featuredLiveProject = projects[0]!; // W Dental Clinic
   const alternatingProjects = projects.slice(1);
 
   return (

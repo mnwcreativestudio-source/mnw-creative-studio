@@ -65,7 +65,7 @@ const DISPOSABLE_EMAIL_DOMAINS = new Set([
 
 function isDisposableEmail(email: string): boolean {
   const parts = email.trim().toLowerCase().split("@");
-  if (parts.length !== 2) return false;
+  if (parts.length !== 2 || !parts[1]) return false;
   return DISPOSABLE_EMAIL_DOMAINS.has(parts[1]);
 }
 
@@ -75,7 +75,7 @@ function normalizeEmail(email?: string | null): string {
 
 function getEnvValue(name: string, envObj: Record<string, string>): string {
   if (envObj[name]) return envObj[name];
-  if (typeof process !== "undefined" && process.env?.[name]) return process.env[name] as string;
+  if (typeof process !== "undefined" && process.env && process.env[name]) return process.env[name] as string;
 
   // Local development fallback: parse .env if process.env does not have it yet
   try {
@@ -86,7 +86,7 @@ function getEnvValue(name: string, envObj: Record<string, string>): string {
         const trimmed = line.trim();
         if (trimmed.startsWith("#") || !trimmed.includes("=")) continue;
         const [k, ...v] = trimmed.split("=");
-        if (k.trim() === name) {
+        if (k && k.trim() === name) {
           return v.join("=").trim().replace(/^["']|["']$/g, "");
         }
       }
@@ -104,10 +104,22 @@ function getEnvValue(name: string, envObj: Record<string, string>): string {
 function getServerConfig(env?: unknown) {
   const envObj = (env as Record<string, string> | undefined) || {};
 
-  const resendApiKey =
+  let resendApiKey =
     getEnvValue("RESEND_API_KEY", envObj) ||
     getEnvValue("VITE_RESEND_API_KEY", envObj) ||
-    getEnvValue("RESEND_KEY", envObj);
+    getEnvValue("RESEND_KEY", envObj) ||
+    getEnvValue("RESEND_TOKEN", envObj) ||
+    getEnvValue("RESEND_API_TOKEN", envObj) ||
+    getEnvValue("RESEND_SECRET", envObj);
+
+  if (!resendApiKey && typeof process !== "undefined" && process.env) {
+    for (const [k, v] of Object.entries(process.env)) {
+      if (/resend/i.test(k) && typeof v === "string" && v.trim().startsWith("re_")) {
+        resendApiKey = v.trim();
+        break;
+      }
+    }
+  }
 
   const resendFromEmail =
     getEnvValue("RESEND_FROM_EMAIL", envObj) ||
@@ -325,7 +337,7 @@ export async function sendInquiryOtp(
       throw new Error(msg);
     }
   } else {
-    const isProd = typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+    const isProd = typeof process !== "undefined" && process.env && process.env["NODE_ENV"] === "production";
     if (isProd) {
       throw new Error(
         "Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing.",
@@ -336,7 +348,7 @@ export async function sendInquiryOtp(
     );
   }
 
-  const isDev = !resendApiKey || (typeof process !== "undefined" && process.env?.NODE_ENV !== "production");
+  const isDev = !resendApiKey || (typeof process !== "undefined" && process.env && process.env["NODE_ENV"] !== "production");
 
   return {
     success: true,
@@ -471,11 +483,11 @@ export async function submitVerifiedInquiryOnServer(
 
   // Parse and verify token signature
   const parts = verificationToken.split(".");
-  if (parts.length !== 2) {
+  const payloadEncoded = parts[0];
+  const signature = parts[1];
+  if (parts.length !== 2 || !payloadEncoded || !signature) {
     throw new Error("Invalid verification token format. Please re-verify your email.");
   }
-
-  const [payloadEncoded, signature] = parts;
 
   const expectedSignature = crypto
     .createHmac("sha256", serverSecret)
