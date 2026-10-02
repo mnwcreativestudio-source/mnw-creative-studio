@@ -104,7 +104,10 @@ function getEnvValue(name: string, envObj: Record<string, string>): string {
 function getServerConfig(env?: unknown) {
   const envObj = (env as Record<string, string> | undefined) || {};
 
-  const resendApiKey = getEnvValue("RESEND_API_KEY", envObj);
+  const resendApiKey =
+    getEnvValue("RESEND_API_KEY", envObj) ||
+    getEnvValue("VITE_RESEND_API_KEY", envObj) ||
+    getEnvValue("RESEND_KEY", envObj);
 
   const resendFromEmail =
     getEnvValue("RESEND_FROM_EMAIL", envObj) ||

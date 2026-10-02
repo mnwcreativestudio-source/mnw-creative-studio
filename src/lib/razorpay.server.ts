@@ -119,10 +119,10 @@ export async function createRazorpayOrderOnServer(
   const amountPaise = amountINR * 100;
   const currency = (getServerEnvVar("RAZORPAY_CURRENCY", env) || "INR").toUpperCase();
 
-  const customerName = (input.customer.name || "").trim().slice(0, 50);
-  const customerEmail = (input.customer.email || "").trim().slice(0, 80);
-  const businessName = (input.customer.business || "").trim().slice(0, 50) || "N/A";
-  const projectType = (input.customer.projectType || plan.name).trim().slice(0, 60);
+  const customerName = (input?.customer?.name || "").trim().slice(0, 50);
+  const customerEmail = (input?.customer?.email || "").trim().slice(0, 80);
+  const businessName = (input?.customer?.business || "").trim().slice(0, 50) || "N/A";
+  const projectType = (input?.customer?.projectType || plan.name).trim().slice(0, 60);
 
   const receiptId = `mnw_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -236,11 +236,11 @@ export async function verifyRazorpayPaymentOnServer(
     const supabase = getSupabase();
     await supabase.from("inquiries").insert([
       {
-        name: input.customer.name.trim(),
-        email: input.customer.email.trim().toLowerCase(),
-        business_name: input.customer.business?.trim() || null,
-        project_type: `${input.customer.projectType || plan.name} [PAID: ${paymentId}]`,
-        message: `${input.customer.message || ""}\n\n--- Verified Payment Details ---\nRazorpay Payment ID: ${paymentId}\nRazorpay Order ID: ${orderId}\nStatus: Verified & Confirmed`,
+        name: input.customer?.name?.trim() || "Valued Client",
+        email: input.customer?.email?.trim().toLowerCase() || "",
+        business_name: input.customer?.business?.trim() || null,
+        project_type: `${input.customer?.projectType || plan.name} [PAID: ${paymentId}]`,
+        message: `${input.customer?.message || ""}\n\n--- Verified Payment Details ---\nRazorpay Payment ID: ${paymentId}\nRazorpay Order ID: ${orderId}\nStatus: Verified & Confirmed`,
       },
     ]);
   } catch (err) {
