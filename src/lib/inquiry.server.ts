@@ -90,20 +90,39 @@ function normalizeEmail(email?: string | null): string {
  * Never exposes or logs the secret key.
  */
 function getResendApiKey(env?: unknown): string {
-  // 1. Primary: direct process.env.RESEND_API_KEY (Node.js runtime / Vercel Serverless environment)
+  // 1. Direct process.env.RESEND_API_KEY (Node.js runtime / Vercel Serverless environment)
   if (typeof process !== "undefined" && process.env) {
+    // Direct property access
+    if (typeof process.env.RESEND_API_KEY === "string" && process.env.RESEND_API_KEY.trim().length > 0) {
+      return process.env.RESEND_API_KEY.trim();
+    }
+
+    // Bracket property access
     const procEnv = process.env as Record<string, string | undefined>;
-    const val = procEnv["RESEND_API_KEY"];
-    if (val && typeof val === "string" && val.trim().length > 0) {
-      return val.trim();
+    const bracketVal = procEnv["RESEND_API_KEY"];
+    if (typeof bracketVal === "string" && bracketVal.trim().length > 0) {
+      return bracketVal.trim();
+    }
+
+    // Trimmed and case-insensitive check in case of leading/trailing spaces in Vercel UI
+    for (const [k, v] of Object.entries(procEnv)) {
+      if (k.trim().toUpperCase() === "RESEND_API_KEY" && typeof v === "string" && v.trim().length > 0) {
+        return v.trim();
+      }
     }
   }
 
-  // 2. Server runtime env parameter (if supplied by host framework)
-  if (env && typeof env === "object" && "RESEND_API_KEY" in env) {
-    const val = (env as Record<string, unknown>)["RESEND_API_KEY"];
+  // 2. Server runtime env parameter (if supplied by host framework context)
+  if (env && typeof env === "object") {
+    const envObj = env as Record<string, unknown>;
+    const val = envObj["RESEND_API_KEY"];
     if (typeof val === "string" && val.trim().length > 0) {
       return val.trim();
+    }
+    for (const [k, v] of Object.entries(envObj)) {
+      if (k.trim().toUpperCase() === "RESEND_API_KEY" && typeof v === "string" && v.trim().length > 0) {
+        return v.trim();
+      }
     }
   }
 
@@ -116,7 +135,7 @@ function getResendApiKey(env?: unknown): string {
         const trimmed = line.trim();
         if (trimmed.startsWith("#") || !trimmed.includes("=")) continue;
         const [k, ...v] = trimmed.split("=");
-        if (k && k.trim() === "RESEND_API_KEY") {
+        if (k && k.trim().toUpperCase() === "RESEND_API_KEY") {
           const parsed = v.join("=").trim().replace(/^["']|["']$/g, "");
           if (parsed) return parsed;
         }
@@ -358,6 +377,11 @@ export async function sendInquiryOtp(
   } else {
     const isProd = typeof process !== "undefined" && process.env && process.env["NODE_ENV"] === "production";
     if (isProd) {
+      const proc = typeof process !== "undefined" && process.env ? process.env : {};
+      const resendInProc = Object.keys(proc).some((k) => k.trim().toUpperCase() === "RESEND_API_KEY");
+      console.error(
+        `[InquiryServer] RESEND_API_KEY missing at server runtime. resendKeyFoundInProcessEnv=${resendInProc}, processEnvKeysCount=${Object.keys(proc).length}`,
+      );
       throw new Error(
         "Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing.",
       );
