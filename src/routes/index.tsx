@@ -290,57 +290,185 @@ function Index() {
           </div>
         </section>
 
-        {/* 4. Core Capabilities (Preview) */}
+        {/* 4. Core Capabilities — Asymmetric Editorial Bento */}
         <section className="relative py-24 sm:py-32 overflow-hidden border-b border-white/[0.06] bg-gradient-to-b from-background via-charcoal/20 to-background">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[42rem] rounded-full bg-gold/[0.03] blur-[150px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[44rem] rounded-full bg-gold/[0.035] blur-[160px]" />
           </div>
 
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
-            <div className="text-center max-w-2xl mx-auto">
-              <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1 text-[0.7rem] font-bold tracking-[0.25em] text-gold uppercase shadow-[0_0_12px_rgba(212,175,55,0.15)]">
-                <Sparkles className="size-3" />
-                Disciplines & Scope
-              </span>
-              <h2 className="mt-5 font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground">
-                What We <span className="text-gold-gradient">Build.</span>
-              </h2>
-              <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted-foreground">
-                Everything your business needs to establish an authoritative, high-converting digital presence.
-              </p>
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1 text-[0.7rem] font-bold tracking-[0.25em] text-gold uppercase shadow-[0_0_12px_rgba(212,175,55,0.15)]">
+                  <Sparkles className="size-3" />
+                  Disciplines & Scope
+                </span>
+                <h2 className="mt-5 font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground">
+                  What We <span className="text-gold-gradient">Build.</span>
+                </h2>
+                <p className="mt-3 max-w-xl text-sm sm:text-base leading-relaxed text-muted-foreground">
+                  We don't build generic pages. We engineer custom digital assets shaped to your exact commercial goals.
+                </p>
+              </div>
+
+              <Link
+                to="/services"
+                className="group inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-gold transition-colors hover:text-gold-soft w-fit"
+              >
+                <span>View Full Services & Specifications</span>
+                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
             </div>
 
-            <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {coreCapabilities.map((cap, i) => (
-                <Reveal key={cap.title} delay={i * 90}>
-                  <div className="group relative flex h-full flex-col justify-between rounded-[2rem] border border-white/[0.08] bg-charcoal/40 backdrop-blur-xl p-8 transition-all duration-500 hover:-translate-y-2 hover:border-gold/50 hover:shadow-[0_22px_55px_rgba(0,0,0,0.85),0_0_25px_rgba(212,175,55,0.12)]">
+            {/* Asymmetric Bento Layout */}
+            <div className="mt-16 grid gap-6 lg:grid-cols-12">
+              {/* Flagship Card 1: Bespoke Web Design (Col span 7) */}
+              <div className="lg:col-span-7">
+                <Reveal className="h-full">
+                  <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[2.5rem] border border-gold/40 bg-gradient-to-br from-charcoal/90 via-charcoal/70 to-charcoal/50 p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-all duration-500 hover:border-gold/60">
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent"
+                    />
+
                     <div>
-                      <span className="flex size-14 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10 text-gold shadow-[0_0_15px_rgba(212,175,55,0.12)] transition-all duration-500 group-hover:scale-110 group-hover:bg-gold/20">
-                        <cap.icon className="size-6" />
-                      </span>
-                      <h3 className="mt-7 font-display text-xl font-bold text-foreground transition-colors duration-300 group-hover:text-gold">
-                        {cap.title}
+                      <div className="flex items-center justify-between">
+                        <span className="flex size-14 items-center justify-center rounded-2xl border border-gold/40 bg-gold/15 text-gold shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                          <Layers className="size-6" />
+                        </span>
+                        <span className="rounded-full border border-gold/30 bg-gold/10 px-3.5 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-gold">
+                          Flagship Discipline
+                        </span>
+                      </div>
+
+                      <h3 className="mt-7 font-display text-2xl sm:text-3xl font-extrabold text-foreground">
+                        Bespoke Web Design & UI/UX
                       </h3>
-                      <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                        {cap.desc}
+                      <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted-foreground">
+                        Distinctive, tailor-made visual identities and UI/UX layouts built on strong typography, brand balance, and intuitive hierarchy.
                       </p>
+
+                      <div className="mt-7 rounded-2xl border border-white/[0.08] bg-black/40 p-4">
+                        <p className="text-[0.65rem] font-mono uppercase tracking-wider text-muted-foreground mb-2.5">
+                          Studio Design Standards // Typography & Spatial Geometry
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          <span className="rounded-xl border border-gold/30 bg-gold/10 px-3 py-1 text-xs font-display font-bold text-gold">
+                            Outfit Display
+                          </span>
+                          <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-xs font-sans text-foreground">
+                            Plus Jakarta Sans
+                          </span>
+                          <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-xs text-muted-foreground font-mono">
+                            8pt Spatial Grid
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="mt-8 pt-5 border-t border-white/[0.06]">
+                    <div className="mt-8 pt-5 border-t border-white/[0.08] flex items-center justify-between">
                       <Link
                         to="/services"
-                        className="inline-flex items-center gap-2 text-xs font-bold text-gold transition-colors hover:text-gold-soft"
+                        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-gold hover:text-gold-soft transition-colors"
                       >
-                        <span>Learn More</span>
+                        <span>Explore Design Capabilities</span>
                         <ArrowRight className="size-3.5" />
                       </Link>
                     </div>
-                  </div>
+                  </article>
                 </Reveal>
-              ))}
+              </div>
+
+              {/* Flagship Card 2: Web Engineering (Col span 5) */}
+              <div className="lg:col-span-5">
+                <Reveal delay={80} className="h-full">
+                  <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[2.5rem] border border-white/[0.1] bg-gradient-to-br from-charcoal/85 via-charcoal/60 to-charcoal/40 p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-all duration-500 hover:border-gold/50">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="flex size-14 items-center justify-center rounded-2xl border border-white/15 bg-white/5 text-foreground shadow-lg">
+                          <Code2 className="size-6 text-gold" />
+                        </span>
+                        <span className="rounded-full border border-emerald-400/40 bg-emerald-950/60 px-3 py-1 text-[0.68rem] font-bold text-emerald-300">
+                          Sub-1.2s Vitals
+                        </span>
+                      </div>
+
+                      <h3 className="mt-7 font-display text-2xl sm:text-3xl font-extrabold text-foreground">
+                        Frontend Engineering
+                      </h3>
+                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                        Fast, responsive web applications built with clean React & TypeScript architecture, delivering sub-second load times.
+                      </p>
+
+                      <div className="mt-6 rounded-2xl border border-white/[0.08] bg-black/50 p-4 font-mono text-[0.72rem] text-muted-foreground">
+                        <p className="text-emerald-400">const stack = &#123;</p>
+                        <p className="pl-4 text-foreground/80">architecture: "React + TanStack",</p>
+                        <p className="pl-4 text-foreground/80">cleanCode: true,</p>
+                        <p className="pl-4 text-gold">performance: "Sub-Second"</p>
+                        <p className="text-emerald-400">&#125;;</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-8 pt-5 border-t border-white/[0.08] flex items-center justify-between">
+                      <Link
+                        to="/services"
+                        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-muted-foreground group-hover:text-gold transition-colors"
+                      >
+                        <span>Inspect Code Standards</span>
+                        <ArrowRight className="size-3.5" />
+                      </Link>
+                    </div>
+                  </article>
+                </Reveal>
+              </div>
+
+              {/* Full-Width Feature Strip 3: Commercial & Custom Solutions (Col span 12) */}
+              <div className="lg:col-span-12">
+                <Reveal delay={120}>
+                  <article className="group relative overflow-hidden rounded-[2.25rem] border border-white/[0.08] bg-charcoal/50 p-8 sm:p-10 backdrop-blur-xl shadow-lg transition-all duration-500 hover:border-gold/45">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                      <div className="flex items-start gap-5">
+                        <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10 text-gold shadow-md">
+                          <ShoppingBag className="size-6" />
+                        </span>
+                        <div>
+                          <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[0.65rem] font-bold text-muted-foreground uppercase tracking-wider">
+                            Full-Stack Scope
+                          </span>
+                          <h4 className="mt-2.5 font-display text-xl sm:text-2xl font-bold text-foreground">
+                            Commercial & Custom Digital Solutions
+                          </h4>
+                          <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
+                            From product storefronts to interactive inquiry portals, appointment systems, and verified payment gateway workflows.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="rounded-full border border-white/[0.08] bg-black/40 px-3.5 py-1.5 text-xs text-foreground/80">
+                          Online Checkout
+                        </span>
+                        <span className="rounded-full border border-white/[0.08] bg-black/40 px-3.5 py-1.5 text-xs text-foreground/80">
+                          OTP Email Verification
+                        </span>
+                        <span className="rounded-full border border-white/[0.08] bg-black/40 px-3.5 py-1.5 text-xs text-foreground/80">
+                          Appointment Scheduling
+                        </span>
+                        <Link
+                          to="/services"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-gold px-5 py-2 text-xs font-bold text-primary-foreground transition-all hover:brightness-110"
+                        >
+                          <span>Explore All</span>
+                          <ArrowRight className="size-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
+              </div>
             </div>
 
-            <div className="mt-12 text-center">
+            <div className="mt-14 text-center">
               <Link
                 to="/services"
                 className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-background/60 px-7 py-3.5 text-xs sm:text-sm font-semibold text-foreground transition-all duration-300 hover:border-gold hover:text-gold"
