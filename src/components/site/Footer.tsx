@@ -3,13 +3,14 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 
 const navLinks = [
-  { label: "Home", href: "/#home" },
-  { label: "Services", href: "/#services" },
-  { label: "Plans", href: "/#plans" },
-  { label: "Work", href: "/#work" },
-  { label: "Process", href: "/#process" },
-  { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Home", to: "/" },
+  { label: "Services", to: "/services" },
+  { label: "Portfolio", to: "/work" },
+  { label: "Pricing", to: "/pricing" },
+  { label: "About", to: "/about" },
+  { label: "Process", to: "/process" },
+  { label: "FAQ", to: "/faq" },
+  { label: "Contact", to: "/contact" },
 ];
 
 const legalLinks = [
@@ -49,12 +50,12 @@ export function Footer() {
             <ul className="mt-5 space-y-3">
               {navLinks.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.to}
                     className="text-xs sm:text-sm text-muted-foreground transition-colors duration-200 hover:text-gold"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -110,13 +111,13 @@ export function Footer() {
                 </a>
               </li>
               <li className="pt-2">
-                <a
-                  href="/#contact"
+                <Link
+                  to="/contact"
                   className="group inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/5 px-4 py-2 text-xs font-bold text-gold transition-all duration-300 hover:bg-gold hover:text-primary-foreground hover:shadow-[var(--shadow-gold)]"
                 >
                   <span>Start a Project</span>
                   <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
