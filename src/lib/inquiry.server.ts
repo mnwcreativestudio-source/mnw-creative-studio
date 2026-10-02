@@ -110,17 +110,28 @@ function getResendApiKey(env?: unknown): string {
         return v.trim();
       }
     }
+
+    // Resilient fallback for common spelling discrepancy in Vercel Dashboard (e.g. RESEN_API_KEY)
+    if (typeof procEnv["RESEN_API_KEY"] === "string" && procEnv["RESEN_API_KEY"].trim().length > 0) {
+      return procEnv["RESEN_API_KEY"].trim();
+    }
+    for (const [k, v] of Object.entries(procEnv)) {
+      if (k.trim().toUpperCase() === "RESEN_API_KEY" && typeof v === "string" && v.trim().length > 0) {
+        return v.trim();
+      }
+    }
   }
 
   // 2. Server runtime env parameter (if supplied by host framework context)
   if (env && typeof env === "object") {
     const envObj = env as Record<string, unknown>;
-    const val = envObj["RESEND_API_KEY"];
+    const val = envObj["RESEND_API_KEY"] || envObj["RESEN_API_KEY"];
     if (typeof val === "string" && val.trim().length > 0) {
       return val.trim();
     }
     for (const [k, v] of Object.entries(envObj)) {
-      if (k.trim().toUpperCase() === "RESEND_API_KEY" && typeof v === "string" && v.trim().length > 0) {
+      const clean = k.trim().toUpperCase();
+      if ((clean === "RESEND_API_KEY" || clean === "RESEN_API_KEY") && typeof v === "string" && v.trim().length > 0) {
         return v.trim();
       }
     }
@@ -390,7 +401,7 @@ export async function sendInquiryOtp(
       );
 
       throw new Error(
-        `Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing. [Diagnostic: resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyNames=[${matchingKeyNames}], hasRePrefixValue=${hasRePrefixValue}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}]`,
+        "Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing.",
       );
     }
     console.warn(
