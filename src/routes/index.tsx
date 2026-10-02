@@ -19,10 +19,14 @@ import { Footer } from "@/components/site/Footer";
 import { BackToTop } from "@/components/site/BackToTop";
 import { Reveal } from "@/components/site/Reveal";
 
-import workDental from "@/assets/work-dental.jpg";
-import workUrbanEats from "@/assets/work-urban-eats.jpg";
-import workLuxuryRealEstate from "@/assets/work-luxury-realestate.jpg";
-import aboutWorkspace from "@/assets/about-workspace.jpg";
+import workDental from "@/assets/work-dental.webp";
+import workDentalMobile from "@/assets/work-dental-mobile.webp";
+import workUrbanEats from "@/assets/work-urban-eats.webp";
+import workUrbanEatsMobile from "@/assets/work-urban-eats-mobile.webp";
+import workLuxuryRealEstate from "@/assets/work-luxury-realestate.webp";
+import workLuxuryRealEstateMobile from "@/assets/work-luxury-realestate-mobile.webp";
+import aboutWorkspace from "@/assets/about-workspace.webp";
+import aboutWorkspaceMobile from "@/assets/about-workspace-mobile.webp";
 
 const title = "MNW Creative Studio | Modern Web Design & Development";
 const description =
@@ -53,6 +57,7 @@ const featuredProjects = [
     description:
       "Modern healthcare website with clear service architecture, calm aesthetics, and seamless appointment booking.",
     image: workDental,
+    imageMobile: workDentalMobile,
     liveUrl: "https://wi-dental-clinic.vercel.app",
   },
   {
@@ -63,6 +68,7 @@ const featuredProjects = [
     description:
       "Artisan culinary showcase featuring sensory food photography, digital menus, and streamlined table reservation flows.",
     image: workUrbanEats,
+    imageMobile: workUrbanEatsMobile,
     liveUrl: "https://urban-eats-demo-mnw-three.vercel.app",
   },
   {
@@ -73,6 +79,7 @@ const featuredProjects = [
     description:
       "Architectural property showcase with immersive dusk photography, floor plans, and private viewing scheduling.",
     image: workLuxuryRealEstate,
+    imageMobile: workLuxuryRealEstateMobile,
   },
 ];
 
@@ -260,11 +267,16 @@ function Index() {
                         <div className="w-8" />
                       </div>
                       <div className="relative aspect-[16/10] overflow-hidden">
-                        <img
-                          src={primaryFeaturedProject.image}
-                          alt="W Dental Clinic healthcare website by MNW Creative Studio"
-                          className="size-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                        />
+                        <picture>
+                          <source media="(max-width: 640px)" srcSet={primaryFeaturedProject.imageMobile} type="image/webp" />
+                          <img
+                            src={primaryFeaturedProject.image}
+                            loading="lazy"
+                            decoding="async"
+                            alt="W Dental Clinic healthcare website by MNW Creative Studio"
+                            className="size-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                          />
+                        </picture>
                       </div>
                     </div>
                   </div>
@@ -331,12 +343,16 @@ function Index() {
                           <div className="w-4" />
                         </div>
                         <div className="relative aspect-[16/10] overflow-hidden">
-                          <img
-                            src={project.image}
-                            loading="lazy"
-                            alt={`Preview of ${project.name}`}
-                            className="size-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                          />
+                          <picture>
+                            <source media="(max-width: 640px)" srcSet={project.imageMobile} type="image/webp" />
+                            <img
+                              src={project.image}
+                              loading="lazy"
+                              decoding="async"
+                              alt={`Preview of ${project.name}`}
+                              className="size-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                            />
+                          </picture>
                         </div>
                       </div>
 
@@ -647,14 +663,18 @@ function Index() {
                 />
                 <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.1] bg-charcoal/60 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.9),0_0_40px_rgba(212,175,55,0.15)] backdrop-blur-2xl">
                   <div className="overflow-hidden rounded-[2rem] bg-charcoal/90 relative">
-                    <img
-                      src={aboutWorkspace}
-                      loading="lazy"
-                      width={1200}
-                      height={800}
-                      alt="MNW Creative Studio modern workspace with web design on monitor and warm ambient lighting"
-                      className="w-full object-cover transition-transform duration-700 ease-out hover:scale-105"
-                    />
+                    <picture>
+                      <source media="(max-width: 640px)" srcSet={aboutWorkspaceMobile} type="image/webp" />
+                      <img
+                        src={aboutWorkspace}
+                        loading="lazy"
+                        decoding="async"
+                        width={1200}
+                        height={800}
+                        alt="MNW Creative Studio modern workspace with web design on monitor and warm ambient lighting"
+                        className="w-full object-cover transition-transform duration-700 ease-out hover:scale-105"
+                      />
+                    </picture>
                     <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-60 pointer-events-none" />
                   </div>
 

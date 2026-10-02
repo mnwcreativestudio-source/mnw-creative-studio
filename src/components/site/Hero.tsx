@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles, Zap, ShieldCheck, CheckCircle2, ExternalLink, Activity } from "lucide-react";
-import heroLaptop from "@/assets/hero-laptop.jpg";
+import heroLaptop from "@/assets/hero-laptop.webp";
+import heroLaptopMobile from "@/assets/hero-laptop-mobile.webp";
 
 export function Hero() {
   return (
@@ -147,13 +148,18 @@ export function Hero() {
 
               {/* Viewport Image Preview with Ambient Reflection */}
               <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.06] bg-black/90">
-                <img
-                  src={heroLaptop}
-                  width={1408}
-                  height={1008}
-                  alt="Modern dark luxury website designed by MNW Creative Studio"
-                  className="w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
-                />
+                <picture>
+                  <source media="(max-width: 640px)" srcSet={heroLaptopMobile} type="image/webp" />
+                  <img
+                    src={heroLaptop}
+                    width={1408}
+                    height={1008}
+                    alt="Modern dark luxury website designed by MNW Creative Studio"
+                    className="w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
               </div>
             </div>

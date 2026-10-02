@@ -12,12 +12,12 @@ import {
   Code2,
   Compass,
 } from "lucide-react";
-import workDental from "@/assets/work-dental.jpg";
-import workUrbanEats from "@/assets/work-urban-eats.jpg";
-import workFitZone from "@/assets/work-fitzone.jpg";
-import workTravelExplorer from "@/assets/work-travel-explorer.jpg";
-import workLuxuryRealEstate from "@/assets/work-luxury-realestate.jpg";
-import workAutoDrive from "@/assets/work-autodrive.jpg";
+import workDental from "@/assets/work-dental.webp";
+import workUrbanEats from "@/assets/work-urban-eats.webp";
+import workFitZone from "@/assets/work-fitzone.webp";
+import workTravelExplorer from "@/assets/work-travel-explorer.webp";
+import workLuxuryRealEstate from "@/assets/work-luxury-realestate.webp";
+import workAutoDrive from "@/assets/work-autodrive.webp";
 import { Reveal } from "./Reveal";
 import { SectionHeading } from "./SectionHeading";
 
@@ -254,6 +254,8 @@ export function Work() {
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <img
                       src={featuredLiveProject.image}
+                      loading="lazy"
+                      decoding="async"
                       alt="W Dental Clinic healthcare website by MNW Creative Studio"
                       className="size-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                     />

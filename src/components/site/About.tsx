@@ -8,7 +8,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import aboutWorkspace from "@/assets/about-workspace.jpg";
+import aboutWorkspace from "@/assets/about-workspace.webp";
+import aboutWorkspaceMobile from "@/assets/about-workspace-mobile.webp";
 import { Reveal } from "./Reveal";
 
 const values = [
@@ -117,14 +118,18 @@ export function About() {
               />
 
               <div className="overflow-hidden rounded-[2rem] bg-charcoal/90 relative">
-                <img
-                  src={aboutWorkspace}
-                  loading="lazy"
-                  width={1200}
-                  height={800}
-                  alt="MNW Creative Studio modern workspace with web design on monitor and warm ambient lighting"
-                  className="w-full object-cover transition-transform duration-700 ease-out hover:scale-105"
-                />
+                <picture>
+                  <source media="(max-width: 640px)" srcSet={aboutWorkspaceMobile} type="image/webp" />
+                  <img
+                    src={aboutWorkspace}
+                    loading="lazy"
+                    decoding="async"
+                    width={1200}
+                    height={800}
+                    alt="MNW Creative Studio modern workspace with web design on monitor and warm ambient lighting"
+                    className="w-full object-cover transition-transform duration-700 ease-out hover:scale-105"
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-60 pointer-events-none" />
               </div>
 

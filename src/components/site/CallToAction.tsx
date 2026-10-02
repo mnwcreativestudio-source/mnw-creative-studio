@@ -1,6 +1,7 @@
 import { ArrowRight, Sparkles, Mail, Clock, ShieldCheck } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import heroLaptop from "@/assets/hero-laptop.jpg";
+import heroLaptop from "@/assets/hero-laptop.webp";
+import heroLaptopMobile from "@/assets/hero-laptop-mobile.webp";
 import { Reveal } from "./Reveal";
 
 export function CallToAction() {
@@ -92,14 +93,18 @@ export function CallToAction() {
                   </div>
 
                   <div className="overflow-hidden rounded-[1.25rem] border border-white/[0.06] bg-black/60">
-                    <img
-                      src={heroLaptop}
-                      loading="lazy"
-                      width={800}
-                      height={500}
-                      alt="Modern website design displayed on laptop screen"
-                      className="w-full object-cover transition-transform duration-700 hover:scale-105"
-                    />
+                    <picture>
+                      <source media="(max-width: 640px)" srcSet={heroLaptopMobile} type="image/webp" />
+                      <img
+                        src={heroLaptop}
+                        loading="lazy"
+                        decoding="async"
+                        width={800}
+                        height={500}
+                        alt="Modern website design displayed on laptop screen"
+                        className="w-full object-cover transition-transform duration-700 hover:scale-105"
+                      />
+                    </picture>
                   </div>
                 </div>
               </div>
