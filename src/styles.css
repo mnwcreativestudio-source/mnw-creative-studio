@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -190,6 +191,42 @@
     box-shadow: var(--shadow-gold);
   }
 }
+
+@utility glass-panel {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.008) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+@utility glass-panel-gold {
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.08) 0%, rgba(20, 20, 26, 0.75) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 25px 60px -15px rgba(212, 175, 55, 0.15), inset 0 1px 1px rgba(212, 175, 55, 0.25);
+}
+
+@utility luxury-glow {
+  box-shadow: 0 0 50px -10px oklch(0.79 0.12 85 / 25%);
+}
+
+@utility text-shimmer {
+  background: linear-gradient(110deg, #F3E5AB 0%, #D4AF37 40%, #FFFDF0 50%, #D4AF37 60%, #AA771C 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
 
 @utility reveal {
   opacity: 0;

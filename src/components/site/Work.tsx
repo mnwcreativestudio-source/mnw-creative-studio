@@ -179,20 +179,25 @@ export function Work() {
   const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
 
   return (
-    <section id="work" className="border-y border-border bg-charcoal/30 py-24 sm:py-32">
+    <section id="work" className="relative border-y border-white/[0.06] bg-gradient-to-b from-charcoal/40 via-background to-charcoal/30 py-24 sm:py-32 overflow-hidden">
+      {/* Ambient background illumination */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[42rem] rounded-full bg-gold/[0.04] blur-[150px]" />
+      </div>
+
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <SectionHeading
-            eyebrow="Portfolio"
+            eyebrow="Curated Portfolio"
             title="Our Latest Work"
             description="Explore selected live client websites and tailored studio concept projects."
           />
-          <div className="hidden md:flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="hidden md:flex items-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-950/60 px-3.5 py-1.5 text-xs font-semibold text-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.15)] backdrop-blur-md">
+              <span className="size-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
               Live Project
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-background/50 px-3 py-1 text-xs font-medium text-muted-foreground">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-charcoal/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur-md">
               <Sparkles className="size-3 text-gold" />
               Demo Projects
             </span>
@@ -200,47 +205,53 @@ export function Work() {
         </div>
 
         {/* Portfolio Grid */}
-        <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, i) => (
             <Reveal key={project.id} delay={i * 60} className="h-full">
-              <article className="premium-card group flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-charcoal/50 transition-all duration-300 hover:-translate-y-1.5 hover:border-gold/60 hover:shadow-[0_12px_36px_oklch(0_0_0_/_60%),0_0_24px_oklch(0.79_0.12_85_/_18%)]">
+              <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[2rem] border border-white/[0.08] bg-charcoal/40 backdrop-blur-xl p-3 transition-all duration-500 hover:-translate-y-2 hover:border-gold/50 hover:shadow-[0_22px_55px_rgba(0,0,0,0.85),0_0_30px_rgba(212,175,55,0.15)]">
+                {/* Subtle top rim light */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                />
+
                 <div className="flex flex-col flex-1">
-                  {/* Image container - larger & clearer presentation */}
-                  <div className="relative aspect-[16/10.5] overflow-hidden bg-charcoal">
+                  {/* Image container with luxury bevel and rounded frame */}
+                  <div className="relative aspect-[16/10.5] overflow-hidden rounded-[1.5rem] bg-charcoal/90 border border-white/[0.05]">
                     <img
                       src={project.image}
                       loading="lazy"
                       width={800}
                       height={525}
                       alt={`Preview of ${project.name} website`}
-                      className="size-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      className="size-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-60" />
 
                     {/* Status Badge */}
                     <div className="absolute top-3.5 right-3.5">
                       {project.status === "Live Project" ? (
-                        <span className="inline-flex items-center gap-2 rounded-full bg-emerald-950/95 border border-emerald-400/60 px-3 py-1.5 text-[0.7rem] font-extrabold tracking-wider text-emerald-300 shadow-[0_0_14px_oklch(0.72_0.17_153_/_40%)] backdrop-blur-md uppercase">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-emerald-950/90 border border-emerald-400/60 px-3 py-1 text-[0.68rem] font-extrabold tracking-wider text-emerald-300 shadow-[0_0_16px_rgba(52,211,153,0.35)] backdrop-blur-md uppercase">
                           <span className="size-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
                           LIVE PROJECT
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-charcoal/90 border border-border/80 px-2.5 py-1 text-[0.68rem] font-semibold tracking-wider text-muted-foreground backdrop-blur-md uppercase">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-charcoal/85 border border-white/[0.08] px-2.5 py-1 text-[0.65rem] font-semibold tracking-wider text-muted-foreground backdrop-blur-md uppercase">
                           DEMO PROJECT
                         </span>
                       )}
                     </div>
 
                     <div className="absolute bottom-3 left-3.5">
-                      <span className="inline-block rounded-md bg-background/80 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-gold backdrop-blur-md border border-gold/25 shadow-sm">
+                      <span className="inline-block rounded-full bg-black/60 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-gold backdrop-blur-md border border-gold/30 shadow-sm">
                         {project.category}
                       </span>
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-6 flex flex-col flex-1">
-                    <h3 className="font-display text-lg sm:text-xl font-bold text-foreground transition-colors group-hover:text-gold line-clamp-1">
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="font-display text-lg sm:text-xl font-bold text-foreground transition-colors duration-300 group-hover:text-gold line-clamp-1">
                       {project.name}
                     </h3>
                     <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground line-clamp-2 h-[2.75rem] sm:h-[3rem]">
@@ -250,13 +261,14 @@ export function Work() {
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="px-6 pb-6 pt-3 border-t border-border/40 flex items-center justify-between gap-2 mt-auto h-16">
+                <div className="px-5 pb-3 pt-3 border-t border-white/[0.06] flex items-center justify-between gap-2 mt-auto">
                   <button
                     type="button"
                     onClick={() => setActiveModalProject(project)}
-                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-foreground transition-colors hover:text-gold group/btn"
+                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-foreground transition-all duration-300 hover:text-gold group/btn"
                   >
-                    <span>View Project →</span>
+                    <span>Explore Case Study</span>
+                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover/btn:translate-x-1 text-gold" />
                   </button>
 
                   {project.liveUrl && (
@@ -264,7 +276,7 @@ export function Work() {
                       href={project.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-[0.72rem] font-semibold text-emerald-400 hover:border-emerald-400 hover:text-emerald-300 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-[0.72rem] font-semibold text-emerald-400 hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 transition-all duration-300"
                     >
                       <span>Live Site</span>
                       <ExternalLink className="size-3" />
@@ -278,7 +290,7 @@ export function Work() {
 
         {/* Tasteful Disclaimer Note */}
         <div className="mt-12 text-center">
-          <div className="inline-flex items-center justify-center gap-2 rounded-full border border-border/80 bg-charcoal/50 px-5 py-2.5 text-xs text-muted-foreground/90 backdrop-blur-sm shadow-sm">
+          <div className="inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-charcoal/50 px-5 py-2.5 text-xs text-muted-foreground/90 backdrop-blur-md shadow-sm">
             <Sparkles className="size-3.5 text-gold shrink-0" />
             <span>
               Demo projects are concept work created by MNW Creative Studio to showcase design and development capabilities.
@@ -293,22 +305,28 @@ export function Work() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="case-study-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-300"
         >
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-background/85 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 bg-background/85 backdrop-blur-xl transition-opacity"
             onClick={() => setActiveModalProject(null)}
           />
 
           {/* Modal Container */}
-          <div className="relative w-full max-w-3xl rounded-3xl border border-gold/40 bg-charcoal/95 p-6 sm:p-8 shadow-[var(--shadow-gold)] backdrop-blur-xl overflow-hidden my-8 max-h-[90vh] overflow-y-auto">
+          <div className="relative w-full max-w-3xl rounded-[2.5rem] border border-gold/40 bg-charcoal/95 p-6 sm:p-10 shadow-[0_30px_100px_rgba(0,0,0,0.9),0_0_40px_rgba(212,175,55,0.15)] backdrop-blur-2xl overflow-hidden my-8 max-h-[90vh] overflow-y-auto">
+            {/* Top rim accent */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-80"
+            />
+
             {/* Close Button */}
             <button
               type="button"
               aria-label="Close case study modal"
               onClick={() => setActiveModalProject(null)}
-              className="absolute top-5 right-5 z-20 flex size-9 items-center justify-center rounded-full border border-border/80 bg-background/60 text-muted-foreground transition-colors hover:border-gold hover:text-gold active:scale-95"
+              className="absolute top-5 right-5 z-20 flex size-9 items-center justify-center rounded-full border border-white/10 bg-background/60 text-muted-foreground transition-all duration-300 hover:border-gold hover:text-gold active:scale-95"
             >
               <X className="size-4" />
             </button>
@@ -341,7 +359,7 @@ export function Work() {
             </div>
 
             {/* Image Preview */}
-            <div className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-black/60 shadow-lg">
+            <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-xl">
               <img
                 src={activeModalProject.image}
                 alt={`Preview of ${activeModalProject.name}`}
@@ -376,13 +394,13 @@ export function Work() {
               {/* Key Features */}
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-gold">
-                  Key Features
+                  Key Architectural Features
                 </h4>
                 <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
                   {activeModalProject.features.map((feat, idx) => (
                     <li
                       key={idx}
-                      className="flex items-start gap-2 rounded-xl bg-background/50 border border-border/60 p-2.5 text-xs text-foreground/90"
+                      className="flex items-start gap-2.5 rounded-xl bg-charcoal/60 border border-white/[0.08] p-3 text-xs text-foreground/90 transition-colors hover:border-gold/30"
                     >
                       <CheckCircle2 className="size-4 shrink-0 text-gold mt-0.5" />
                       <span>{feat}</span>
@@ -395,7 +413,7 @@ export function Work() {
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
                   <Smartphone className="size-3.5" />
-                  <span>Responsive Design</span>
+                  <span>Responsive Engineering</span>
                 </h4>
                 <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {activeModalProject.responsiveNotes}
@@ -403,7 +421,7 @@ export function Work() {
               </div>
 
               {/* Result / Purpose Note */}
-              <div className="rounded-2xl border border-gold/30 bg-gold/10 p-4">
+              <div className="rounded-2xl border border-gold/30 bg-gold/[0.06] p-4.5">
                 <span className="text-[0.68rem] font-bold uppercase tracking-wider text-gold block">
                   Project Purpose
                 </span>
@@ -414,7 +432,7 @@ export function Work() {
             </div>
 
             {/* Actions */}
-            <div className="mt-8 pt-5 border-t border-border/60 flex flex-wrap items-center justify-between gap-3">
+            <div className="mt-8 pt-5 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3">
               <a
                 href="#contact"
                 onClick={() => setActiveModalProject(null)}
@@ -430,10 +448,10 @@ export function Work() {
                     href={activeModalProject.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-background/60 py-2.5 px-4 text-xs font-semibold text-foreground transition-all hover:border-gold hover:text-gold"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 py-2.5 px-4 text-xs font-semibold text-emerald-400 transition-all hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300"
                   >
                     <span>View Live Website</span>
-                    <ArrowUpRight className="size-3.5 text-gold" />
+                    <ArrowUpRight className="size-3.5 text-emerald-400" />
                   </a>
                 )}
                 <button

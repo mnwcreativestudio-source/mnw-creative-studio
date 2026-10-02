@@ -30,7 +30,7 @@ export function LegalLayout({
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground selection:bg-gold/20 selection:text-gold">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-border/80 bg-[#131316]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-charcoal/80 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.6)]">
         <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5 sm:px-8">
           <Link to="/" aria-label="MNW Creative Studio — Return to Home" className="py-2">
             <Logo />

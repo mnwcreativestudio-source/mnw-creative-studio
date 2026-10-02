@@ -70,7 +70,12 @@ export function FAQ() {
   };
 
   return (
-    <section id="faq" className="py-16 sm:py-20 relative">
+    <section id="faq" className="relative py-24 sm:py-32 overflow-hidden border-t border-white/[0.06] bg-gradient-to-b from-background via-charcoal/20 to-background">
+      {/* Ambient background light */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-1/2 left-1/2 size-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.03] blur-[160px]" />
+      </div>
+
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
         <SectionHeading
           eyebrow="Questions & Answers"
@@ -78,17 +83,17 @@ export function FAQ() {
           description="Everything you need to know about our design process, pricing, timelines, and deliverables."
         />
 
-        <div className="mt-10 space-y-3">
+        <div className="mt-14 space-y-3.5">
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
               <Reveal key={index} delay={index * 30}>
                 <div
                   className={cn(
-                    "rounded-2xl border transition-all duration-300",
+                    "rounded-[1.5rem] border backdrop-blur-xl transition-all duration-400 overflow-hidden",
                     isOpen
-                      ? "border-gold/50 bg-charcoal/80 shadow-[var(--shadow-gold)]"
-                      : "border-border/70 bg-charcoal/30 hover:border-gold/30 hover:bg-charcoal/50",
+                      ? "border-gold/60 bg-charcoal/70 shadow-[0_15px_40px_rgba(0,0,0,0.7),0_0_20px_rgba(212,175,55,0.12)]"
+                      : "border-white/[0.08] bg-charcoal/35 hover:border-gold/40 hover:bg-charcoal/55",
                   )}
                 >
                   <button
@@ -96,17 +101,17 @@ export function FAQ() {
                     onClick={() => toggleFAQ(index)}
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${index}`}
-                    className="flex w-full items-center justify-between gap-4 py-4 px-4 sm:py-4.5 sm:px-6 text-left transition-colors"
+                    className="flex w-full items-center justify-between gap-4 py-4.5 px-5 sm:py-5 sm:px-7 text-left transition-colors"
                   >
-                    <span className="flex items-center gap-3 font-display text-base sm:text-lg font-bold text-foreground">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold text-xs font-bold border border-gold/20">
+                    <span className="flex items-center gap-3.5 font-display text-base sm:text-lg font-bold text-foreground">
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-gold/10 text-gold text-xs font-bold border border-gold/30 shadow-[0_0_10px_rgba(212,175,55,0.1)]">
                         {index + 1}
                       </span>
                       <span>{faq.question}</span>
                     </span>
                     <span
                       className={cn(
-                        "flex size-8 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background/50 text-gold transition-transform duration-300",
+                        "flex size-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-background/50 text-gold transition-all duration-300",
                         isOpen && "rotate-180 border-gold/40 bg-gold/15",
                       )}
                     >
@@ -117,7 +122,7 @@ export function FAQ() {
                   {isOpen && (
                     <div
                       id={`faq-answer-${index}`}
-                      className="px-4 pb-4.5 sm:px-6 sm:pb-5 pt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground border-t border-border/40 animate-in fade-in duration-200"
+                      className="px-5 pb-5 sm:px-7 sm:pb-6 pt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground border-t border-white/[0.06] animate-in fade-in duration-200"
                     >
                       <p>{faq.answer}</p>
                     </div>
@@ -129,8 +134,8 @@ export function FAQ() {
         </div>
 
         {/* Still have questions banner */}
-        <div className="mt-9 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-charcoal/40 px-5 py-2.5 text-xs text-muted-foreground">
+        <div className="mt-12 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-charcoal/50 px-6 py-3 text-xs text-muted-foreground/90 backdrop-blur-md shadow-sm">
             <HelpCircle className="size-3.5 text-gold" />
             <span>Have a specific question not covered here?</span>
             <a href="#contact" className="font-bold text-gold hover:underline ml-1">

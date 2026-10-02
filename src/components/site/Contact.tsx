@@ -367,25 +367,26 @@ export function Contact() {
   };
 
   const inputClass =
-    "w-full rounded-2xl border border-input/80 bg-charcoal/40 px-4 py-3.5 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-gold/60 focus:bg-charcoal/70 focus:ring-2 focus:ring-gold/15";
+    "w-full rounded-2xl border border-white/10 bg-black/40 px-4.5 py-3.5 text-sm text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground/50 focus:border-gold/70 focus:bg-black/60 focus:ring-2 focus:ring-gold/20 shadow-inner";
 
   return (
-    <section id="contact" className="relative overflow-hidden py-24 sm:py-32">
+    <section id="contact" className="relative overflow-hidden py-24 sm:py-32 border-t border-white/[0.06] bg-gradient-to-b from-charcoal/30 via-background to-charcoal/40">
       {/* Refined ambient gold lighting */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-1/3 left-1/4 size-[40rem] -translate-x-1/2 rounded-full bg-gold/5 blur-[160px]" />
-        <div className="absolute bottom-10 right-1/4 size-[32rem] rounded-full bg-gold/4 blur-[140px]" />
+        <div className="absolute top-1/3 left-1/4 size-[44rem] -translate-x-1/2 rounded-full bg-gold/[0.04] blur-[160px]" />
+        <div className="absolute bottom-10 right-1/4 size-[36rem] rounded-full bg-gold/[0.03] blur-[140px]" />
       </div>
 
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
           {/* Left Column: Headline, Narrative & Direct Channels */}
           <Reveal className="flex flex-col">
-            <span className="text-[0.7rem] font-semibold tracking-[0.3em] text-gold uppercase">
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1 text-[0.7rem] font-bold tracking-[0.25em] text-gold uppercase shadow-[0_0_12px_rgba(212,175,55,0.15)] w-fit">
+              <Sparkles className="size-3" />
               Get In Touch
             </span>
 
-            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-balance text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
+            <h2 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-balance text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
               Let’s Build <span className="text-gold-gradient">Something Great.</span>
             </h2>
 
@@ -400,9 +401,9 @@ export function Contact() {
             {/* Direct Contact Cards */}
             <div className="space-y-4">
               {/* Email Card with 1-click copy */}
-              <div className="premium-card group relative flex items-center justify-between gap-4 rounded-3xl p-6 transition-all duration-300">
+              <div className="group relative flex items-center justify-between gap-4 rounded-[1.75rem] border border-white/[0.08] bg-charcoal/40 backdrop-blur-xl p-6 transition-all duration-400 hover:border-gold/50 hover:bg-charcoal/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6)]">
                 <a href={`mailto:${EMAIL}`} className="flex items-center gap-4 text-left">
-                  <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-gold/25 bg-gold/10 text-gold transition-all duration-300 group-hover:scale-105 group-hover:bg-gold/15">
+                  <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10 text-gold shadow-[0_0_15px_rgba(212,175,55,0.12)] transition-all duration-300 group-hover:scale-105 group-hover:bg-gold/20">
                     <Mail className="size-5" />
                   </span>
                   <div>
@@ -419,7 +420,7 @@ export function Contact() {
                   type="button"
                   onClick={handleCopyEmail}
                   aria-label="Copy studio email address"
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/80 bg-background/50 px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-all duration-200 hover:border-gold/50 hover:text-gold active:scale-95"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-background/60 px-4 py-1.5 text-xs font-medium text-muted-foreground transition-all duration-200 hover:border-gold/50 hover:text-gold active:scale-95"
                 >
                   {copiedEmail ? (
                     <>
@@ -440,10 +441,10 @@ export function Contact() {
                 href="https://www.instagram.com/mnwcreativestudio/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="premium-card group flex items-center justify-between gap-4 rounded-3xl p-6 transition-all duration-300"
+                className="group flex items-center justify-between gap-4 rounded-[1.75rem] border border-white/[0.08] bg-charcoal/40 backdrop-blur-xl p-6 transition-all duration-400 hover:border-gold/50 hover:bg-charcoal/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6)]"
               >
                 <div className="flex items-center gap-4">
-                  <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-gold/25 bg-gold/10 text-gold transition-all duration-300 group-hover:scale-105 group-hover:bg-gold/15">
+                  <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10 text-gold shadow-[0_0_15px_rgba(212,175,55,0.12)] transition-all duration-300 group-hover:scale-105 group-hover:bg-gold/20">
                     <Instagram className="size-5" />
                   </span>
                   <div>
@@ -456,7 +457,7 @@ export function Contact() {
                   </div>
                 </div>
 
-                <span className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-all duration-300 group-hover:border-gold/50 group-hover:text-gold group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                <span className="inline-flex size-9 items-center justify-center rounded-full border border-white/10 bg-background/60 text-muted-foreground transition-all duration-300 group-hover:border-gold/50 group-hover:text-gold group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                   <ArrowUpRight className="size-4" />
                 </span>
               </a>
@@ -476,26 +477,32 @@ export function Contact() {
 
           {/* Right Column: Tabbed Glassmorphism Inquiry Form */}
           <Reveal delay={120}>
-            <div className="rounded-[2.25rem] border border-border/80 bg-charcoal/50 p-6 sm:p-9 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-300 hover:border-gold/30">
+            <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.1] bg-charcoal/40 p-6 sm:p-10 shadow-[0_30px_80px_rgba(0,0,0,0.85),0_0_35px_rgba(212,175,55,0.08)] backdrop-blur-2xl transition-all duration-400 hover:border-gold/30">
+              {/* Subtle top rim light */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"
+              />
+
               <form id="contact-form" onSubmit={handleSubmit} noValidate>
                 {/* 2-Step Tabs Header */}
-                <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-charcoal/80 p-1.5 border border-border/70">
+                <div className="mb-8 grid grid-cols-2 gap-2 rounded-2xl bg-black/40 p-1.5 border border-white/[0.08] backdrop-blur-md">
                   <button
                     type="button"
                     onClick={() => setActiveTab("contact")}
                     className={cn(
-                      "flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-semibold transition-all duration-200",
+                      "flex items-center justify-center gap-2 rounded-xl py-3 px-3 text-xs sm:text-sm font-semibold transition-all duration-300",
                       activeTab === "contact"
-                        ? "bg-gold text-primary-foreground shadow-md font-bold"
+                        ? "bg-gradient-to-r from-gold via-gold-soft to-gold text-charcoal font-black shadow-[0_0_15px_rgba(212,175,55,0.3)]"
                         : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     <span className="flex size-5 items-center justify-center rounded-full bg-black/20 text-[0.65rem] font-bold">
-                      {isEmailVerified ? <Check className="size-3 text-emerald-400" /> : "1"}
+                      {isEmailVerified ? <Check className="size-3 text-emerald-950 stroke-[3]" /> : "1"}
                     </span>
                     <span>1. Verification</span>
                     {isEmailVerified && (
-                      <span className="hidden sm:inline-block size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="hidden sm:inline-block size-1.5 rounded-full bg-emerald-950 animate-pulse" />
                     )}
                   </button>
 
@@ -504,9 +511,9 @@ export function Contact() {
                     disabled={!isEmailVerified}
                     onClick={() => isEmailVerified && setActiveTab("project")}
                     className={cn(
-                      "flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-semibold transition-all duration-200",
+                      "flex items-center justify-center gap-2 rounded-xl py-3 px-3 text-xs sm:text-sm font-semibold transition-all duration-300",
                       activeTab === "project"
-                        ? "bg-gold text-primary-foreground shadow-md font-bold"
+                        ? "bg-gradient-to-r from-gold via-gold-soft to-gold text-charcoal font-black shadow-[0_0_15px_rgba(212,175,55,0.3)]"
                         : isEmailVerified
                           ? "text-muted-foreground hover:text-foreground cursor-pointer"
                           : "text-muted-foreground/40 cursor-not-allowed",

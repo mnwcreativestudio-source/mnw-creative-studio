@@ -439,16 +439,25 @@ export function Plans() {
             <Reveal key={plan.name} delay={i * 100} className="flex h-full">
               <article
                 className={cn(
-                  "relative flex w-full flex-col justify-between rounded-3xl p-7 transition-all duration-300 sm:p-9",
+                  "relative flex w-full flex-col justify-between rounded-[2.25rem] p-7 transition-all duration-500 sm:p-9 backdrop-blur-xl",
                   plan.highlighted
-                    ? "border-2 border-gold/80 bg-gradient-to-b from-charcoal/90 via-charcoal/65 to-charcoal/45 shadow-[var(--shadow-gold)] hover:-translate-y-2 hover:border-gold hover:shadow-[0_25px_60px_-15px_oklch(0.79_0.12_85_/_45%)]"
-                    : "border border-border/80 bg-charcoal/30 hover:-translate-y-2 hover:border-gold/40 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]",
+                    ? "border-2 border-gold/70 bg-gradient-to-b from-charcoal/95 via-charcoal/70 to-charcoal/45 shadow-[0_25px_65px_-15px_rgba(212,175,55,0.3)] hover:-translate-y-2 hover:border-gold hover:shadow-[0_30px_75px_-15px_rgba(212,175,55,0.45)]"
+                    : "border border-white/[0.08] bg-charcoal/40 hover:-translate-y-2 hover:border-gold/40 hover:shadow-[0_20px_50px_rgba(0,0,0,0.7)]",
                 )}
               >
+                {/* Subtle top rim light */}
+                <div
+                  aria-hidden
+                  className={cn(
+                    "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent",
+                    plan.highlighted ? "opacity-100" : "opacity-30",
+                  )}
+                />
+
                 {/* Recommended Badge for Professional */}
                 {plan.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-4 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-gold)]">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold via-gold-soft to-gold px-4 py-1 text-xs font-extrabold uppercase tracking-wider text-charcoal shadow-[0_0_20px_rgba(212,175,55,0.4)]">
                       <Sparkles className="size-3 fill-current" />
                       {plan.badge}
                     </span>
@@ -463,14 +472,14 @@ export function Plans() {
                     </h3>
                   </div>
 
-                  <p className="mt-2 text-sm font-medium text-gold">{plan.audience}</p>
+                  <p className="mt-2 text-sm font-semibold text-gold">{plan.audience}</p>
 
                   <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                     {plan.description}
                   </p>
 
                   {/* Pricing Display */}
-                  <div className="mt-6 rounded-2xl border border-border/60 bg-background/50 p-5">
+                  <div className="mt-6 rounded-2xl border border-white/[0.06] bg-black/40 p-5 backdrop-blur-md">
                     <div className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
                       {plan.name === "PREMIUM" ? "Starting at" : plan.priceType}
                     </div>
@@ -498,11 +507,13 @@ export function Plans() {
                         >
                           <span
                             className={cn(
-                              "mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full",
-                              plan.highlighted ? "bg-gold/20 text-gold" : "bg-gold/10 text-gold/90",
+                              "mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border",
+                              plan.highlighted
+                                ? "bg-gold/20 border-gold/40 text-gold"
+                                : "bg-gold/10 border-gold/20 text-gold/90",
                             )}
                           >
-                            <Check className="size-3.5 stroke-[2.5]" />
+                            <Check className="size-3 stroke-[2.5]" />
                           </span>
                           <span className="leading-snug text-foreground/90">{feature}</span>
                         </li>
@@ -519,15 +530,15 @@ export function Plans() {
                 </div>
 
                 {/* Choose Plan CTA Button */}
-                <div className="mt-9 border-t border-border/50 pt-6">
+                <div className="mt-9 border-t border-white/[0.06] pt-6">
                   <button
                     type="button"
                     onClick={() => openInquiryModal(plan)}
                     className={cn(
                       "group inline-flex w-full items-center justify-center gap-2 rounded-full py-4 px-6 text-sm font-semibold transition-all duration-300 active:scale-95",
                       plan.highlighted
-                        ? "bg-gold text-primary-foreground shadow-[var(--shadow-gold)] hover:brightness-110"
-                        : "border border-gold/50 text-gold hover:bg-gold hover:text-primary-foreground hover:shadow-[var(--shadow-gold)]",
+                        ? "bg-gold text-primary-foreground shadow-[var(--shadow-gold)] hover:brightness-110 hover:shadow-[0_12px_30px_rgba(212,175,55,0.4)]"
+                        : "border border-gold/40 text-gold hover:bg-gold hover:text-primary-foreground hover:shadow-[var(--shadow-gold)]",
                     )}
                   >
                     <span>Choose Plan</span>
@@ -541,11 +552,16 @@ export function Plans() {
 
         {/* Separate Advanced Projects Section */}
         <Reveal delay={200} className="mt-12 sm:mt-16">
-          <div className="premium-card relative overflow-hidden rounded-[2.5rem] border border-gold/40 bg-gradient-to-br from-charcoal/90 via-charcoal/65 to-charcoal/40 p-7 shadow-[0_30px_80px_-25px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:p-11">
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-gold/35 bg-gradient-to-br from-charcoal/90 via-charcoal/65 to-charcoal/40 p-7 shadow-[0_30px_80px_-25px_rgba(0,0,0,0.85)] backdrop-blur-2xl sm:p-11">
             {/* Ambient gold glow decoration */}
             <div
               aria-hidden
               className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full bg-gold/10 blur-3xl"
+            />
+            {/* Top rim accent */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent"
             />
 
             <div className="grid gap-8 lg:grid-cols-[1.1fr_1.3fr] lg:items-center">
@@ -590,7 +606,7 @@ export function Plans() {
               </div>
 
               {/* Feature Checklist */}
-              <div className="rounded-3xl border border-border/80 bg-background/50 p-6 sm:p-8">
+              <div className="rounded-3xl border border-white/[0.08] bg-black/40 p-6 sm:p-8 backdrop-blur-md">
                 <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-gold">
                   Capabilities & Included Scope
                 </p>
@@ -600,7 +616,7 @@ export function Plans() {
                       key={feature}
                       className="flex items-start gap-3 text-sm text-muted-foreground"
                     >
-                      <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/20 text-gold">
+                      <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/20 text-gold border border-gold/30">
                         <Check className="size-3.5 stroke-[2.5]" />
                       </span>
                       <span className="leading-snug text-foreground/90 font-medium">{feature}</span>
@@ -614,8 +630,8 @@ export function Plans() {
 
         {/* Project Details Transparency Section */}
         <Reveal delay={250} className="mt-12 sm:mt-16">
-          <div className="rounded-3xl border border-border/70 bg-charcoal/40 p-6 sm:p-9">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/50 pb-5">
+          <div className="rounded-[2.25rem] border border-white/[0.08] bg-charcoal/35 backdrop-blur-xl p-6 sm:p-9">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/[0.06] pb-5">
               <div>
                 <span className="text-xs font-semibold tracking-wider text-gold uppercase">
                   Project Engagement Details
@@ -630,7 +646,7 @@ export function Plans() {
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4.5 transition-colors hover:border-gold/30">
                 <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-gold" />
                   Domain & Hosting
@@ -640,7 +656,7 @@ export function Plans() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4.5 transition-colors hover:border-gold/30">
                 <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-gold" />
                   Delivery Timelines
@@ -650,7 +666,7 @@ export function Plans() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4.5 transition-colors hover:border-gold/30">
                 <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-gold" />
                   Revision Policy
@@ -660,7 +676,7 @@ export function Plans() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4.5 transition-colors hover:border-gold/30">
                 <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-gold" />
                   Maintenance & Support
@@ -670,7 +686,7 @@ export function Plans() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-border/50 bg-background/40 p-4 sm:col-span-2 lg:col-span-2">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4.5 sm:col-span-2 lg:col-span-2 transition-colors hover:border-gold/30">
                 <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-gold" />
                   Client Assets & Content
@@ -680,7 +696,7 @@ export function Plans() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-gold/40 bg-gold/5 p-4 sm:col-span-2 lg:col-span-3">
+              <div className="rounded-2xl border border-gold/30 bg-gold/[0.05] p-5 sm:col-span-2 lg:col-span-3">
                 <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-gold" />
                   Third-Party Services & Payment Gateway Charges
