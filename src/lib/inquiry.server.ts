@@ -380,16 +380,17 @@ export async function sendInquiryOtp(
       const proc = typeof process !== "undefined" && process.env ? process.env : {};
       const resendDirect = Boolean(process.env?.RESEND_API_KEY);
       const resendBracket = Boolean((proc as Record<string, string | undefined>)["RESEND_API_KEY"]);
-      const matchingKeyName = Object.keys(proc).find((k) => k.trim().toLowerCase().includes("resend")) || "none";
+      const matchingKeyNames = Object.keys(proc).filter((k) => /resend|key|secret|email|mail/i.test(k)).join(", ") || "none";
+      const hasRePrefixValue = Object.entries(proc).some(([_, v]) => typeof v === "string" && v.trim().startsWith("re_"));
       const razorpayConfigured = Boolean((proc as Record<string, string | undefined>)["RAZORPAY_KEY_SECRET"]);
       const totalKeys = Object.keys(proc).length;
 
       console.error(
-        `[InquiryServer] RESEND_API_KEY missing at server runtime. resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyName=${matchingKeyName}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}`,
+        `[InquiryServer] RESEND_API_KEY missing at server runtime. resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyNames=[${matchingKeyNames}], hasRePrefixValue=${hasRePrefixValue}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}`,
       );
 
       throw new Error(
-        `Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing. [Diagnostic: resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyName=${matchingKeyName}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}]`,
+        `Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing. [Diagnostic: resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyNames=[${matchingKeyNames}], hasRePrefixValue=${hasRePrefixValue}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}]`,
       );
     }
     console.warn(
