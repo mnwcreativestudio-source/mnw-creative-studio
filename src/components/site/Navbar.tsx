@@ -6,10 +6,12 @@ import { Logo } from "./Logo";
 const links = [
   { label: "Home", href: "#home" },
   { label: "Services", href: "#services" },
-  { label: "Plans", href: "#plans" },
-  { label: "Work", href: "#work" },
+  { label: "Portfolio", href: "#work" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "Why Us", href: "#why-us" },
   { label: "Process", href: "#process" },
   { label: "About", href: "#about" },
+  { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -45,12 +47,12 @@ export function Navbar() {
           <Logo />
         </a>
 
-        <nav aria-label="Main" className="hidden items-center gap-9 lg:flex">
+        <nav aria-label="Main" className="hidden items-center gap-7 lg:flex">
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="relative text-sm text-muted-foreground transition-colors duration-200 after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-gold after:transition-transform after:duration-300 hover:text-foreground hover:after:origin-left hover:after:scale-x-100"
+              className="relative text-xs xl:text-sm font-medium text-muted-foreground transition-colors duration-200 after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-gold after:transition-transform after:duration-300 hover:text-foreground hover:after:origin-left hover:after:scale-x-100"
             >
               {link.label}
             </a>
@@ -60,9 +62,9 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <a
             href="#contact"
-            className="hidden rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold transition-all duration-300 hover:bg-gold hover:text-primary-foreground hover:shadow-[var(--shadow-gold)] sm:inline-flex"
+            className="hidden rounded-full bg-gold px-5 py-2.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all duration-300 hover:brightness-110 active:scale-95 sm:inline-flex"
           >
-            Get Started
+            Start Your Project →
           </a>
           <button
             type="button"

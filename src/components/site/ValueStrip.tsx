@@ -7,7 +7,7 @@ export function ValueStrip() {
     <section aria-label="What we do" className="relative border-y border-border py-6">
       <div className="pointer-events-none absolute inset-0 bg-charcoal/40" />
       <div className="relative flex overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
-        <div className="animate-marquee flex shrink-0 items-center gap-10 pr-10">
+        <div className="animate-marquee-reverse flex shrink-0 items-center gap-10 pr-10">
           {sequence.map((item, i) => (
             <span
               key={`a-${item}-${i}`}
@@ -18,7 +18,7 @@ export function ValueStrip() {
             </span>
           ))}
         </div>
-        <div aria-hidden className="animate-marquee flex shrink-0 items-center gap-10 pr-10">
+        <div aria-hidden className="animate-marquee-reverse flex shrink-0 items-center gap-10 pr-10">
           {sequence.map((item, i) => (
             <span
               key={`b-${item}-${i}`}

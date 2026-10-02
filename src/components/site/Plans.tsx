@@ -14,10 +14,15 @@ import {
   CreditCard,
   Wallet,
   MessageSquare,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./Reveal";
 import { SectionHeading } from "./SectionHeading";
+import { createRazorpayOrder, verifyRazorpayPayment } from "@/lib/payment-server";
+import { launchRazorpayModal } from "@/lib/razorpay-checkout";
+import { getPlanDisplayINR } from "@/lib/razorpay-shared";
+import { submitInquiry } from "@/lib/supabase";
 
 const STUDIO_EMAIL = "mnwcreativestudio@gmail.com";
 
@@ -153,6 +158,18 @@ export function Plans() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedDetails, setCopiedDetails] = useState(false);
 
+  // Razorpay Payment States
+  type PaymentStatus = "idle" | "creating_order" | "verifying" | "success" | "failed" | "cancelled";
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("idle");
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [verifiedPayment, setVerifiedPayment] = useState<{
+    paymentId: string;
+    orderId: string;
+    amountINR: number;
+    planName: string;
+  } | null>(null);
+  const [copiedReceipt, setCopiedReceipt] = useState(false);
+
   // Lock body scroll when modal is open
   useEffect(() => {
     if (selectedPlan) {
@@ -189,6 +206,10 @@ export function Plans() {
     setModalStep(1);
     setErrorMessage(null);
     setCopiedDetails(false);
+    setPaymentStatus("idle");
+    setPaymentError(null);
+    setVerifiedPayment(null);
+    setCopiedReceipt(false);
   };
 
   const closeModal = () => {
@@ -196,6 +217,125 @@ export function Plans() {
     setModalStep(1);
     setErrorMessage(null);
     setCopiedDetails(false);
+    setPaymentStatus("idle");
+    setPaymentError(null);
+    setVerifiedPayment(null);
+    setCopiedReceipt(false);
+  };
+
+  const handleProceedToPayment = () => {
+    setModalStep(3);
+    setPaymentStatus("idle");
+    setPaymentError(null);
+
+    // Record inquiry lead in Supabase
+    submitInquiry({
+      name: inquiryData.name,
+      email: inquiryData.email,
+      business: inquiryData.business,
+      projectType: `${inquiryData.projectType} [Checkout Initiated]`,
+      message: inquiryData.message,
+    }).catch((err) => {
+      console.warn("Initial lead capture note:", err);
+    });
+  };
+
+  const handlePayWithRazorpay = async () => {
+    if (!selectedPlan) return;
+    setPaymentStatus("creating_order");
+    setPaymentError(null);
+
+    try {
+      // 1. Create order on server (client-provided amounts are never trusted)
+      const order = await createRazorpayOrder({
+        planId: selectedPlan.name,
+        customer: {
+          name: inquiryData.name,
+          email: inquiryData.email,
+          business: inquiryData.business,
+          projectType: inquiryData.projectType,
+          message: inquiryData.message,
+        },
+      });
+
+      // 2. Open Razorpay Checkout modal on the client using the public Key ID
+      await launchRazorpayModal({
+        order,
+        customer: {
+          name: inquiryData.name,
+          email: inquiryData.email,
+          business: inquiryData.business,
+          projectType: inquiryData.projectType,
+          message: inquiryData.message,
+        },
+        onSuccess: async (response) => {
+          // 3. User paid in modal, now verify HMAC signature server-side
+          setPaymentStatus("verifying");
+          try {
+            const verification = await verifyRazorpayPayment({
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+              planId: selectedPlan.name,
+              customer: {
+                name: inquiryData.name,
+                email: inquiryData.email,
+                business: inquiryData.business,
+                projectType: inquiryData.projectType,
+                message: inquiryData.message,
+              },
+            });
+
+            if (verification.success) {
+              setVerifiedPayment({
+                paymentId: response.razorpay_payment_id,
+                orderId: response.razorpay_order_id,
+                amountINR: order.amountINR,
+                planName: selectedPlan.name,
+              });
+              setPaymentStatus("success");
+            } else {
+              setPaymentStatus("failed");
+              setPaymentError("Payment verification could not be validated with the server.");
+            }
+          } catch (err: unknown) {
+            setPaymentStatus("failed");
+            const msg = err instanceof Error ? err.message : "Payment verification failed.";
+            setPaymentError(msg);
+          }
+        },
+        onDismiss: () => {
+          setPaymentStatus("cancelled");
+        },
+        onError: (errorMsg) => {
+          setPaymentStatus("failed");
+          setPaymentError(errorMsg);
+        },
+      });
+    } catch (err: unknown) {
+      setPaymentStatus("failed");
+      const msg = err instanceof Error ? err.message : "Failed to initialize payment gateway.";
+      setPaymentError(msg);
+    }
+  };
+
+  const handleCopyReceipt = () => {
+    if (!verifiedPayment) return;
+    const text = [
+      "MNW Creative Studio — Payment Confirmation",
+      "------------------------------------------",
+      `Plan: ${verifiedPayment.planName}`,
+      `Amount Paid: ₹${verifiedPayment.amountINR.toLocaleString("en-IN")} INR`,
+      `Razorpay Payment ID: ${verifiedPayment.paymentId}`,
+      `Razorpay Order ID: ${verifiedPayment.orderId}`,
+      `Client: ${inquiryData.name} (${inquiryData.email})`,
+      `Date: ${new Date().toLocaleString()}`,
+      "Status: Verified & Confirmed",
+    ].join("\n");
+
+    navigator.clipboard.writeText(text);
+    setCopiedReceipt(true);
+    setTimeout(() => setCopiedReceipt(false), 2200);
   };
 
   const handleContinue = (e: React.FormEvent) => {
@@ -264,6 +404,7 @@ export function Plans() {
 
   return (
     <section id="plans" className="relative py-24 sm:py-32">
+      <div id="pricing" className="absolute -top-20" />
       {/* Background ambient lighting */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 size-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/5 blur-[160px]" />
@@ -450,6 +591,77 @@ export function Plans() {
                     </li>
                   ))}
                 </ul>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Project Details Transparency Section */}
+        <Reveal delay={250} className="mt-12 sm:mt-16">
+          <div className="rounded-3xl border border-border/70 bg-charcoal/40 p-6 sm:p-9">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/50 pb-5">
+              <div>
+                <span className="text-xs font-semibold tracking-wider text-gold uppercase">
+                  Project Engagement Details
+                </span>
+                <h4 className="mt-1 text-lg sm:text-xl font-bold text-foreground">
+                  Clear, Transparent Working Standards
+                </h4>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                No hidden costs • Tailored to your scope
+              </span>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+                <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-gold" />
+                  Domain & Hosting
+                </h5>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                  Discussed and configured based on your infrastructure preferences and project requirements.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+                <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-gold" />
+                  Delivery Timelines
+                </h5>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                  Project completion timelines depend directly on your total page scope and functional requirements.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+                <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-gold" />
+                  Revision Policy
+                </h5>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                  Structured design reviews and iterative refinements are included according to your selected plan.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border/50 bg-background/40 p-4">
+                <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-gold" />
+                  Maintenance & Support
+                </h5>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                  Ongoing maintenance, technical updates, and support packages are available post-launch.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border/50 bg-background/40 p-4 sm:col-span-2 lg:col-span-2">
+                <h5 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-gold" />
+                  Client Assets & Content
+                </h5>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                  Timely provision of brand assets, copy, and media helps ensure all planned milestones are met on schedule.
+                </p>
               </div>
             </div>
           </div>
@@ -809,7 +1021,7 @@ export function Plans() {
                   <div className="mt-7 space-y-3">
                     <button
                       type="button"
-                      onClick={() => setModalStep(3)}
+                      onClick={handleProceedToPayment}
                       className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold py-4 px-8 text-sm font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95"
                     >
                       <span>Continue to Payment</span>
@@ -839,138 +1051,307 @@ export function Plans() {
               </div>
             )}
 
-            {/* STEP 3: Payment Placeholder Screen (Starter, Professional, Premium) */}
+            {/* STEP 3: Razorpay Secure Payment Screen */}
             {modalStep === 3 && (
               <div className="py-2 animate-in zoom-in-95 duration-200">
-                <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-gold/40 bg-gold/15 text-gold shadow-[var(--shadow-gold)]">
-                  <ShieldCheck className="size-8" />
-                </div>
+                {/* 1. PAYMENT SUCCESS STATE */}
+                {paymentStatus === "success" && verifiedPayment ? (
+                  <div className="text-center py-4">
+                    <div className="mx-auto flex size-16 items-center justify-center rounded-2xl border border-gold/40 bg-gold/20 text-gold shadow-[var(--shadow-gold)]">
+                      <CheckCircle2 className="size-9 stroke-[2.2]" />
+                    </div>
 
-                <div className="mt-4 text-center">
-                  <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">
-                    Checkout Preview
-                  </span>
-                  <h3 className="mt-1 font-display text-2xl font-extrabold text-foreground sm:text-3xl">
-                    Secure Payment
-                  </h3>
-                  <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-muted-foreground">
-                    Review your selected plan and payment options below.
-                  </p>
-                </div>
-
-                {/* Plan & Amount Summary */}
-                <div className="mt-6 rounded-2xl border border-gold/30 bg-background/60 p-5">
-                  <div className="flex items-center justify-between border-b border-border/50 pb-3">
-                    <span className="text-xs text-muted-foreground">Your selected plan</span>
-                    <span className="font-display text-base font-bold text-foreground">
-                      {selectedPlan.name}
+                    <span className="mt-4 inline-block text-[0.68rem] font-bold uppercase tracking-[0.25em] text-gold">
+                      Payment Verified & Confirmed
                     </span>
-                  </div>
-                  <div className="flex items-baseline justify-between pt-3">
-                    <span className="text-xs text-muted-foreground">Amount</span>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="font-display text-2xl sm:text-3xl font-extrabold text-gold">
-                        {selectedPlan.priceUSD}
-                      </span>
-                      <span className="text-xs font-bold uppercase tracking-wider text-foreground">
-                        USD
-                      </span>
+                    <h3 className="mt-1 font-display text-2xl font-extrabold text-foreground sm:text-3xl">
+                      Payment Successful!
+                    </h3>
+                    <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
+                      Thank you! Your payment for the{" "}
+                      <strong className="text-gold font-semibold">{verifiedPayment.planName}</strong> has
+                      been securely verified. Our studio has received your project details and will
+                      reach out via email within 24 hours.
+                    </p>
+
+                    {/* Receipt Details Card */}
+                    <div className="mt-6 rounded-2xl border border-gold/30 bg-background/60 p-5 text-left text-xs space-y-2.5">
+                      <div className="flex justify-between border-b border-border/50 pb-2">
+                        <span className="text-muted-foreground">Selected Plan</span>
+                        <span className="font-bold text-foreground">{verifiedPayment.planName}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-border/50 py-2">
+                        <span className="text-muted-foreground">Amount Paid</span>
+                        <span className="font-bold text-gold">
+                          ₹{verifiedPayment.amountINR.toLocaleString("en-IN")} INR
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-b border-border/50 py-2">
+                        <span className="text-muted-foreground">Razorpay Payment ID</span>
+                        <span className="font-mono font-medium text-foreground select-all break-all">
+                          {verifiedPayment.paymentId}
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-b border-border/50 py-2">
+                        <span className="text-muted-foreground">Order Reference</span>
+                        <span className="font-mono text-muted-foreground select-all break-all">
+                          {verifiedPayment.orderId}
+                        </span>
+                      </div>
+                      <div className="flex justify-between pt-1">
+                        <span className="text-muted-foreground">Client Name</span>
+                        <span className="font-semibold text-foreground">{inquiryData.name}</span>
+                      </div>
+                    </div>
+
+                    {/* Actions: Copy & Done */}
+                    <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={handleCopyReceipt}
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border/80 bg-background/50 py-3.5 px-5 text-xs font-semibold text-foreground transition-all hover:border-gold/40 hover:text-gold active:scale-95"
+                      >
+                        {copiedReceipt ? (
+                          <>
+                            <Check className="size-4 text-gold" />
+                            <span className="text-gold">Receipt Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="size-4" />
+                            <span>Copy Receipt Details</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={closeModal}
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gold py-3.5 px-6 text-xs font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95"
+                      >
+                        <span>Finish & Close</span>
+                      </button>
                     </div>
                   </div>
-                </div>
+                ) : paymentStatus === "verifying" ? (
+                  /* 2. VERIFYING PAYMENT SIGNATURE STATE */
+                  <div className="text-center py-8">
+                    <div className="mx-auto flex size-16 items-center justify-center rounded-2xl border border-gold/40 bg-gold/15 text-gold shadow-[var(--shadow-gold)]">
+                      <RefreshCw className="size-8 animate-spin" />
+                    </div>
+                    <h3 className="mt-4 font-display text-2xl font-extrabold text-foreground">
+                      Verifying Payment...
+                    </h3>
+                    <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-muted-foreground">
+                      Please wait while we validate your payment signature with Razorpay and secure
+                      your order. Do not close or refresh this window.
+                    </p>
+                  </div>
+                ) : (
+                  /* 3. CHECKOUT PREVIEW & PAYMENT SELECTION */
+                  <div>
+                    <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-gold/40 bg-gold/15 text-gold shadow-[var(--shadow-gold)]">
+                      <ShieldCheck className="size-8" />
+                    </div>
 
-                {/* Payment methods coming soon pill */}
-                <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-gold/30 bg-gold/10 py-2.5 px-4 text-xs font-semibold text-gold">
-                  <Sparkles className="size-3.5" />
-                  <span>Payment methods coming soon</span>
-                </div>
+                    <div className="mt-4 text-center">
+                      <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">
+                        Secure Checkout
+                      </span>
+                      <h3 className="mt-1 font-display text-2xl font-extrabold text-foreground sm:text-3xl">
+                        Complete Your Order
+                      </h3>
+                      <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-muted-foreground">
+                        Review your plan investment and proceed with secure live checkout.
+                      </p>
+                    </div>
 
-                {/* Two Payment Method Cards: Razorpay & PayPal */}
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {/* Razorpay Card */}
-                  <div className="relative rounded-2xl border border-border/70 bg-charcoal/40 p-4 transition-all hover:border-gold/40">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-gold/10 text-gold border border-gold/20">
-                          <CreditCard className="size-4" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-foreground">Razorpay</h4>
-                          <p className="text-[0.7rem] text-muted-foreground">
-                            Cards, UPI, NetBanking & Wallets
-                          </p>
+                    {/* Plan & Amount Summary */}
+                    <div className="mt-6 rounded-2xl border border-gold/30 bg-background/60 p-5">
+                      <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                        <span className="text-xs text-muted-foreground">Selected Plan</span>
+                        <span className="font-display text-base font-bold text-foreground">
+                          {selectedPlan.name}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline justify-between pt-3">
+                        <span className="text-xs text-muted-foreground">USD Price</span>
+                        <div className="flex items-baseline gap-2 text-right">
+                          <span className="font-display text-2xl sm:text-3xl font-extrabold text-gold">
+                            {selectedPlan.priceUSD}
+                          </span>
+                          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            USD
+                          </span>
                         </div>
                       </div>
-                      <span className="rounded-full bg-charcoal border border-border/80 px-2 py-0.5 text-[0.65rem] font-medium text-muted-foreground">
-                        Coming Soon
-                      </span>
-                    </div>
-                  </div>
 
-                  {/* PayPal Card */}
-                  <div className="relative rounded-2xl border border-border/70 bg-charcoal/40 p-4 transition-all hover:border-gold/40">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-gold/10 text-gold border border-gold/20">
-                          <Wallet className="size-4" />
+                      {/* Display fixed INR conversion amount for India & Razorpay */}
+                      {getPlanDisplayINR(selectedPlan.name) && (
+                        <div className="mt-3 flex items-center justify-between rounded-xl bg-charcoal/60 px-3.5 py-2.5 border border-border/60">
+                          <span className="text-xs font-medium text-muted-foreground">
+                            Razorpay INR Amount
+                          </span>
+                          <span className="text-xs sm:text-sm font-bold text-foreground">
+                            {getPlanDisplayINR(selectedPlan.name)} INR
+                            {selectedPlan.isCustomPriced ? " starting amount" : ""}
+                          </span>
                         </div>
+                      )}
+                    </div>
+
+                    {/* Error Notice (if failed) */}
+                    {paymentStatus === "failed" && paymentError && (
+                      <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-destructive/50 bg-destructive/10 p-3.5 text-xs text-destructive-foreground">
+                        <AlertCircle className="size-4 shrink-0 text-destructive mt-0.5" />
                         <div>
-                          <h4 className="text-sm font-bold text-foreground">PayPal</h4>
-                          <p className="text-[0.7rem] text-muted-foreground">
-                            PayPal Balance & Cards
-                          </p>
+                          <strong className="block font-semibold">Payment Unsuccessful</strong>
+                          <span className="mt-0.5 block text-muted-foreground">{paymentError}</span>
                         </div>
                       </div>
-                      <span className="rounded-full bg-charcoal border border-border/80 px-2 py-0.5 text-[0.65rem] font-medium text-muted-foreground">
-                        Coming Soon
-                      </span>
+                    )}
+
+                    {/* Cancellation Notice (if user closed popup) */}
+                    {paymentStatus === "cancelled" && (
+                      <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-gold/30 bg-gold/10 p-3.5 text-xs text-foreground/90">
+                        <AlertCircle className="size-4 shrink-0 text-gold mt-0.5" />
+                        <div>
+                          <strong className="block font-semibold text-gold">
+                            Payment Cancelled
+                          </strong>
+                          <span className="mt-0.5 block text-muted-foreground">
+                            The Razorpay window was closed. No funds were debited. You can retry
+                            whenever you are ready.
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Payment Method Cards */}
+                    <div className="mt-5 space-y-3">
+                      {/* RAZORPAY LIVE CARD */}
+                      <div className="relative rounded-2xl border-2 border-gold/70 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-charcoal/50 p-4 shadow-[var(--shadow-gold)] transition-all">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="flex size-10 items-center justify-center rounded-xl bg-gold/15 text-gold border border-gold/30 shadow-[0_0_15px_oklch(0.79_0.12_85_/_25%)]">
+                              <CreditCard className="size-5" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-sm font-bold text-foreground">Razorpay</h4>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[0.62rem] font-semibold text-emerald-400">
+                                  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                  Live Payment
+                                </span>
+                              </div>
+                              <p className="text-[0.72rem] text-muted-foreground mt-0.5">
+                                UPI, Credit/Debit Cards, NetBanking & Wallets
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pay with Razorpay Button */}
+                        <div className="mt-4">
+                          <button
+                            type="button"
+                            disabled={paymentStatus === "creating_order"}
+                            onClick={handlePayWithRazorpay}
+                            className={cn(
+                              "group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3.5 px-6 text-sm font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all duration-300 hover:brightness-110 active:scale-95",
+                              paymentStatus === "creating_order" && "opacity-80 cursor-wait",
+                            )}
+                          >
+                            {paymentStatus === "creating_order" ? (
+                              <>
+                                <RefreshCw className="size-4 animate-spin" />
+                                <span>Opening Secure Checkout...</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>
+                                  Pay with Razorpay{" "}
+                                  {getPlanDisplayINR(selectedPlan.name)
+                                    ? `(${getPlanDisplayINR(selectedPlan.name)})`
+                                    : ""}
+                                </span>
+                                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* PAYPAL CARD (Secondary / Coming Soon) */}
+                      <div className="relative rounded-2xl border border-border/60 bg-charcoal/30 p-4 transition-all opacity-75">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="flex size-10 items-center justify-center rounded-xl bg-background/50 text-muted-foreground border border-border/60">
+                              <Wallet className="size-5" />
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-bold text-foreground">PayPal</h4>
+                              <p className="text-[0.72rem] text-muted-foreground">
+                                International PayPal Balance & Cards
+                              </p>
+                            </div>
+                          </div>
+                          <span className="rounded-full bg-charcoal border border-border/80 px-2 py-0.5 text-[0.65rem] font-medium text-muted-foreground">
+                            Upon Request
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Security Badge */}
+                    <div className="mt-4 rounded-xl border border-border/60 bg-charcoal/30 p-3 text-center">
+                      <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-foreground/90">
+                        <Lock className="size-3.5 text-gold" />
+                        <span>256-Bit SSL Encrypted • Powered by Razorpay</span>
+                      </div>
+                    </div>
+
+                    {/* Secondary Option: Discuss First */}
+                    <div className="mt-4 rounded-2xl border border-dashed border-border/80 bg-background/40 p-3.5 text-center">
+                      <p className="text-xs text-muted-foreground">Prefer to discuss first?</p>
+                      <button
+                        type="button"
+                        onClick={handleContactStudio}
+                        className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:underline transition-all active:scale-95"
+                      >
+                        <MessageSquare className="size-3.5" />
+                        <span>Contact MNW Creative Studio</span>
+                      </button>
+                    </div>
+
+                    {/* Navigation: Back to Review & Close */}
+                    <div className="mt-5 flex items-center justify-between border-t border-border/50 pt-4">
+                      <button
+                        type="button"
+                        disabled={paymentStatus === "creating_order"}
+                        onClick={() => {
+                          setPaymentStatus("idle");
+                          setPaymentError(null);
+                          setModalStep(2);
+                        }}
+                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-gold transition-colors disabled:opacity-50"
+                      >
+                        <ArrowLeft className="size-3.5" />
+                        <span>Back to Review</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={paymentStatus === "creating_order"}
+                        onClick={closeModal}
+                        className="text-xs font-semibold text-muted-foreground hover:text-foreground underline transition-colors disabled:opacity-50"
+                      >
+                        Close
+                      </button>
                     </div>
                   </div>
-                </div>
-
-                {/* Security Assurance */}
-                <div className="mt-4 rounded-xl border border-border/60 bg-charcoal/30 p-3.5 text-center">
-                  <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-foreground/90">
-                    <Lock className="size-3.5 text-gold" />
-                    <span>Secure international payment</span>
-                  </div>
-                  <p className="mt-1 text-[0.72rem] text-muted-foreground">
-                    Payment details are handled securely through the payment provider.
-                  </p>
-                </div>
-
-                {/* Secondary Option: Discuss First */}
-                <div className="mt-5 rounded-2xl border border-dashed border-border/80 bg-background/40 p-4 text-center">
-                  <p className="text-xs text-muted-foreground">Prefer to discuss first?</p>
-                  <button
-                    type="button"
-                    onClick={handleContactStudio}
-                    className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:underline transition-all active:scale-95"
-                  >
-                    <MessageSquare className="size-3.5" />
-                    <span>Contact MNW Creative Studio</span>
-                  </button>
-                </div>
-
-                {/* Navigation: Back to Review & Close */}
-                <div className="mt-6 flex items-center justify-between border-t border-border/50 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setModalStep(2)}
-                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-gold transition-colors"
-                  >
-                    <ArrowLeft className="size-3.5" />
-                    <span>Back to Review</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="text-xs font-semibold text-muted-foreground hover:text-foreground underline transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </div>

@@ -10,10 +10,22 @@ import {
   RefreshCw,
   AlertCircle,
   ArrowUpRight,
+  ShieldCheck,
+  Clock,
+  ArrowRight,
+  ArrowLeft,
+  Lock,
+  Edit2,
 } from "lucide-react";
 import { Reveal } from "./Reveal";
 import { cn } from "@/lib/utils";
-import { submitInquiry } from "@/lib/supabase";
+import {
+  requestEmailOtp,
+  verifyEmailOtp,
+  submitVerifiedInquiry,
+  isDisposableEmail,
+} from "@/lib/inquiry-client";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 const EMAIL = "mnwcreativestudio@gmail.com";
 
@@ -47,15 +59,58 @@ const initialFields: Fields = {
 };
 
 export function Contact() {
+  const [activeTab, setActiveTab] = useState<"contact" | "project">("contact");
   const [fields, setFields] = useState<Fields>(initialFields);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+
+  // Email Verification State
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [verificationToken, setVerificationToken] = useState<string | null>(null);
+  const [verifiedEmail, setVerifiedEmail] = useState("");
+
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpStatusMessage, setOtpStatusMessage] = useState<string | null>(null);
+  const [otpErrorMessage, setOtpErrorMessage] = useState<string | null>(null);
+
+  // Timers
+  const [otpExpirySeconds, setOtpExpirySeconds] = useState(0);
+  const [resendCooldownSeconds, setResendCooldownSeconds] = useState(0);
+
+  // Form Submission State
   const [sent, setSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedMessage, setCopiedMessage] = useState(false);
 
-  // Synchronize plan selection if the user clicked "Get Started" on a plan card
+  // 60-Second Expiry Countdown
+  useEffect(() => {
+    if (otpExpirySeconds <= 0) return;
+    const interval = setInterval(() => {
+      setOtpExpirySeconds((prev) => {
+        if (prev <= 1) {
+          setOtpErrorMessage("This verification code has expired (valid for 60 seconds). Please request a new code.");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [otpExpirySeconds]);
+
+  // 30-Second Resend Cooldown Countdown
+  useEffect(() => {
+    if (resendCooldownSeconds <= 0) return;
+    const interval = setInterval(() => {
+      setResendCooldownSeconds((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendCooldownSeconds]);
+
+  // Synchronize plan selection if user clicked "Get Started" on a pricing card
   useEffect(() => {
     const handlePlanSelect = (e: CustomEvent<string>) => {
       const planName = e.detail;
@@ -76,7 +131,7 @@ export function Contact() {
           : `Hello MNW Studio, I am interested in getting started with the ${planName} Plan for our website project.`,
       }));
 
-      // Smoothly scroll and focus the form
+      // Scroll smoothly to contact form
       setTimeout(() => {
         const formEl = document.getElementById("contact-form");
         if (formEl) {
@@ -95,53 +150,162 @@ export function Contact() {
     (key: keyof Fields) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setErrorMessage(null);
-      setFields((prev) => ({ ...prev, [key]: event.target.value }));
+      setOtpErrorMessage(null);
+      const val = event.target.value;
+
+      // If user edits email after being verified, reset verification for security
+      if (key === "email" && isEmailVerified && val.trim().toLowerCase() !== verifiedEmail) {
+        setIsEmailVerified(false);
+        setVerificationToken(null);
+        setVerifiedEmail("");
+        setOtpSent(false);
+        setOtpCode("");
+      }
+
+      setFields((prev) => ({ ...prev, [key]: val }));
     };
 
-  const getEmailContent = () => {
-    const subject = `New Project Inquiry — ${fields.name.trim() || "Client"}`;
-    const body = [
-      `Client Name: ${fields.name.trim() || "—"}`,
-      `Email Address: ${fields.email.trim() || "—"}`,
-      `Business / Brand: ${fields.business.trim() || "—"}`,
-      `Selected Plan / Service: ${fields.projectType || selectedPlan || "General Inquiry"}`,
-      "",
-      "Project Details & Goals:",
-      fields.message.trim() || "—",
-    ].join("\n");
-
-    return { subject, body };
+  const formatTimer = (totalSecs: number) => {
+    const s = Math.max(0, totalSecs);
+    return `00:${s.toString().padStart(2, "0")}`;
   };
 
+  // Step 1: Send OTP to entered email
+  const handleSendOtp = async () => {
+    setOtpErrorMessage(null);
+    setOtpStatusMessage(null);
+
+    const email = fields.email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) {
+      setOtpErrorMessage("Please enter your email address.");
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      setOtpErrorMessage("Please enter a valid email format (e.g. name@company.com).");
+      return;
+    }
+    if (isDisposableEmail(email)) {
+      setOtpErrorMessage(
+        "Please use a permanent business or personal email address (temporary disposable emails are not accepted).",
+      );
+      return;
+    }
+
+    setIsSendingOtp(true);
+    try {
+      const res = await requestEmailOtp(email);
+      setOtpSent(true);
+      setOtpCode("");
+      setOtpExpirySeconds(res.expiresInSeconds || 60); // strictly 60 seconds
+      setResendCooldownSeconds(res.cooldownSeconds || 30); // 30 seconds
+      setOtpStatusMessage(res.message || "Verification code sent! Please check your inbox.");
+    } catch (err: unknown) {
+      setOtpErrorMessage(
+        err instanceof Error ? err.message : "Failed to send verification code. Please try again.",
+      );
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  // Step 1: Verify the 6-digit OTP
+  const handleVerifyOtp = async (codeToVerify?: string) => {
+    const code = (codeToVerify ?? otpCode).trim();
+    if (!code || code.length !== 6) {
+      setOtpErrorMessage("Please enter the complete 6-digit verification code.");
+      return;
+    }
+
+    setOtpErrorMessage(null);
+    setOtpStatusMessage(null);
+    setIsVerifyingOtp(true);
+
+    try {
+      const res = await verifyEmailOtp(fields.email, code);
+      setIsEmailVerified(true);
+      setVerificationToken(res.verificationToken);
+      setVerifiedEmail(res.email);
+      setOtpStatusMessage("Email verified ✓");
+      setOtpSent(false);
+      setOtpCode("");
+    } catch (err: unknown) {
+      setOtpErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please check the OTP and try again.",
+      );
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleOtpChange = (value: string) => {
+    setOtpCode(value);
+    setOtpErrorMessage(null);
+    if (value.length === 6) {
+      handleVerifyOtp(value);
+    }
+  };
+
+  const handleEditEmail = () => {
+    setIsEmailVerified(false);
+    setVerificationToken(null);
+    setVerifiedEmail("");
+    setOtpSent(false);
+    setOtpCode("");
+    setOtpStatusMessage(null);
+    setOtpErrorMessage(null);
+  };
+
+  const handleNextStep = () => {
+    setErrorMessage(null);
+    if (!fields.name.trim() || fields.name.trim().length < 2) {
+      setErrorMessage("Please enter your name (at least 2 characters).");
+      return;
+    }
+    if (!isEmailVerified || !verificationToken) {
+      setErrorMessage("Please verify your email address before continuing.");
+      return;
+    }
+    setActiveTab("project");
+  };
+
+  // Step 2: Final Inquiry Submission
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting) return;
 
     setErrorMessage(null);
 
-    // Form validation
+    if (!isEmailVerified || !verificationToken) {
+      setErrorMessage("Please verify your email in Step 1 before submitting.");
+      setActiveTab("contact");
+      return;
+    }
+
     if (!fields.name.trim()) {
-      setErrorMessage("Please enter your name.");
+      setErrorMessage("Please enter your name in Step 1.");
+      setActiveTab("contact");
       return;
     }
-    if (!fields.email.trim() || !/^\S+@\S+\.\S+$/.test(fields.email)) {
-      setErrorMessage("Please enter a valid email address.");
-      return;
-    }
-    if (!fields.message.trim()) {
-      setErrorMessage("Please enter a short message about your project.");
+
+    if (!fields.message.trim() || fields.message.trim().length < 5) {
+      setErrorMessage("Please enter a short message about your project (at least 5 characters).");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await submitInquiry({
+      await submitVerifiedInquiry({
         name: fields.name,
         email: fields.email,
         business: fields.business,
         projectType: fields.projectType || selectedPlan || null,
         message: fields.message,
+        verificationToken,
       });
 
       setSent(true);
@@ -155,6 +319,21 @@ export function Contact() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getEmailContent = () => {
+    const subject = `New Project Inquiry — ${fields.name.trim() || "Client"}`;
+    const body = [
+      `Client Name: ${fields.name.trim() || "—"}`,
+      `Email Address: ${fields.email.trim() || "—"} [Verified: ✓]`,
+      `Business / Brand: ${fields.business.trim() || "—"}`,
+      `Selected Plan / Service: ${fields.projectType || selectedPlan || "General Inquiry"}`,
+      "",
+      "Project Details & Goals:",
+      fields.message.trim() || "—",
+    ].join("\n");
+
+    return { subject, body };
   };
 
   const handleCopyEmail = () => {
@@ -174,8 +353,16 @@ export function Contact() {
   const handleReset = () => {
     setFields(initialFields);
     setSelectedPlan(null);
+    setIsEmailVerified(false);
+    setVerificationToken(null);
+    setVerifiedEmail("");
+    setOtpSent(false);
+    setOtpCode("");
+    setActiveTab("contact");
     setSent(false);
     setErrorMessage(null);
+    setOtpErrorMessage(null);
+    setOtpStatusMessage(null);
     setIsSubmitting(false);
   };
 
@@ -287,10 +474,54 @@ export function Contact() {
             </div>
           </Reveal>
 
-          {/* Right Column: Premium Glassmorphism Inquiry Form */}
+          {/* Right Column: Tabbed Glassmorphism Inquiry Form */}
           <Reveal delay={120}>
-            <div className="rounded-[2.25rem] border border-border/80 bg-charcoal/50 p-7 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-300 hover:border-gold/30 sm:p-10">
+            <div className="rounded-[2.25rem] border border-border/80 bg-charcoal/50 p-6 sm:p-9 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-300 hover:border-gold/30">
               <form id="contact-form" onSubmit={handleSubmit} noValidate>
+                {/* 2-Step Tabs Header */}
+                <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-charcoal/80 p-1.5 border border-border/70">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("contact")}
+                    className={cn(
+                      "flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-semibold transition-all duration-200",
+                      activeTab === "contact"
+                        ? "bg-gold text-primary-foreground shadow-md font-bold"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <span className="flex size-5 items-center justify-center rounded-full bg-black/20 text-[0.65rem] font-bold">
+                      {isEmailVerified ? <Check className="size-3 text-emerald-400" /> : "1"}
+                    </span>
+                    <span>1. Verification</span>
+                    {isEmailVerified && (
+                      <span className="hidden sm:inline-block size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={!isEmailVerified}
+                    onClick={() => isEmailVerified && setActiveTab("project")}
+                    className={cn(
+                      "flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-semibold transition-all duration-200",
+                      activeTab === "project"
+                        ? "bg-gold text-primary-foreground shadow-md font-bold"
+                        : isEmailVerified
+                          ? "text-muted-foreground hover:text-foreground cursor-pointer"
+                          : "text-muted-foreground/40 cursor-not-allowed",
+                    )}
+                  >
+                    <span className="flex size-5 items-center justify-center rounded-full bg-black/20 text-[0.65rem] font-bold">
+                      2
+                    </span>
+                    <span>2. Project Scope</span>
+                    {!isEmailVerified && (
+                      <Lock className="size-3 text-muted-foreground/40 hidden sm:inline-block" />
+                    )}
+                  </button>
+                </div>
+
                 {/* Active Plan Selector Pill */}
                 {selectedPlan && (
                   <div className="mb-6 flex items-center justify-between rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3">
@@ -316,155 +547,405 @@ export function Contact() {
                   </div>
                 )}
 
-                {/* Inline Error State */}
+                {/* Global Error Banner */}
                 {errorMessage && (
-                  <div className="mb-6 flex items-center gap-2.5 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive-foreground">
+                  <div className="mb-6 flex items-center gap-2.5 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive-foreground animate-in fade-in duration-200">
                     <AlertCircle className="size-4 shrink-0 text-destructive" />
                     <span>{errorMessage}</span>
                   </div>
                 )}
 
-                <div className="grid gap-5 sm:grid-cols-2">
-                  {/* Name Field */}
-                  <div>
-                    <label
-                      htmlFor="contact-name"
-                      className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                    >
-                      Name <span className="text-gold">*</span>
-                    </label>
-                    <input
-                      id="contact-name"
-                      type="text"
-                      required
-                      disabled={isSubmitting}
-                      value={fields.name}
-                      onChange={update("name")}
-                      placeholder="Your full name"
-                      className={cn(inputClass, isSubmitting && "opacity-70 cursor-not-allowed")}
-                    />
+                {/* ======================================================== */}
+                {/* TAB 1: IDENTITY & EMAIL OTP VERIFICATION */}
+                {/* ======================================================== */}
+                {activeTab === "contact" && (
+                  <div className="space-y-5 animate-in fade-in duration-200">
+                    <div>
+                      <label
+                        htmlFor="contact-name"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                      >
+                        Your Name <span className="text-gold">*</span>
+                      </label>
+                      <input
+                        id="contact-name"
+                        type="text"
+                        required
+                        value={fields.name}
+                        onChange={update("name")}
+                        placeholder="John Doe"
+                        className={inputClass}
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label
+                          htmlFor="contact-email"
+                          className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                        >
+                          Email Address <span className="text-gold">*</span>
+                        </label>
+                        {isEmailVerified && (
+                          <span className="inline-flex items-center gap-1 text-[0.7rem] font-bold text-emerald-400">
+                            <Check className="size-3" />
+                            Verified
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="relative">
+                        <input
+                          id="contact-email"
+                          type="email"
+                          required
+                          disabled={isEmailVerified || isSendingOtp}
+                          value={fields.email}
+                          onChange={update("email")}
+                          placeholder="john@company.com"
+                          className={cn(
+                            inputClass,
+                            isEmailVerified && "border-emerald-500/50 bg-emerald-950/20 pr-24 text-emerald-300 font-medium",
+                          )}
+                        />
+
+                        {isEmailVerified && (
+                          <button
+                            type="button"
+                            onClick={handleEditEmail}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded-full border border-border/80 bg-charcoal/80 px-2.5 py-1 text-[0.68rem] font-medium text-muted-foreground hover:text-gold hover:border-gold/40 transition-colors"
+                          >
+                            <Edit2 className="size-3" />
+                            <span>Change</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Email Verification Component */}
+                    <div className="pt-1">
+                      {isEmailVerified ? (
+                        /* Prominent Email Verified Badge */
+                        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/40 p-4.5 flex items-center justify-between gap-3 shadow-[0_0_20px_oklch(0.72_0.17_153_/_15%)]">
+                          <div className="flex items-center gap-3">
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 shadow-sm">
+                              <Check className="size-5" />
+                            </span>
+                            <div>
+                              <span className="text-sm font-extrabold text-emerald-300 tracking-wide block">
+                                Email Verified ✓
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Verified access to <span className="text-foreground">{verifiedEmail}</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          <span className="text-[0.68rem] font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/30 rounded-full px-2.5 py-0.5">
+                            Ready
+                          </span>
+                        </div>
+                      ) : (
+                        /* Verification Trigger & OTP Entry Panel */
+                        <div className="rounded-2xl border border-border/80 bg-charcoal/60 p-4.5 sm:p-5">
+                          {!otpSent ? (
+                            /* Trigger Button */
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                              <div>
+                                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                  <ShieldCheck className="size-4 text-gold" />
+                                  <span>Email Verification Required</span>
+                                </span>
+                                <p className="text-[0.72rem] text-muted-foreground mt-0.5">
+                                  We will send a 6-digit security code to your email.
+                                </p>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={handleSendOtp}
+                                disabled={isSendingOtp || !fields.email.trim()}
+                                className={cn(
+                                  "inline-flex items-center justify-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95 shrink-0",
+                                  (!fields.email.trim() || isSendingOtp) && "opacity-70 cursor-not-allowed",
+                                )}
+                              >
+                                {isSendingOtp ? (
+                                  <>
+                                    <RefreshCw className="size-3.5 animate-spin" />
+                                    <span>Sending Code...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>Verify Email</span>
+                                    <ArrowRight className="size-3.5" />
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            /* 6-Digit OTP Input & Timers */
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                  <ShieldCheck className="size-4 text-gold" />
+                                  <span>Enter 6-Digit Verification Code</span>
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={handleEditEmail}
+                                  className="text-xs text-muted-foreground hover:text-gold underline"
+                                >
+                                  Edit Email
+                                </button>
+                              </div>
+
+                              <p className="text-xs text-muted-foreground">
+                                We sent a 6-digit code to <strong className="text-foreground">{fields.email}</strong>.
+                              </p>
+
+                              {/* 6-Digit Slot Inputs */}
+                              <div className="flex justify-center py-2">
+                                <InputOTP
+                                  maxLength={6}
+                                  value={otpCode}
+                                  onChange={handleOtpChange}
+                                  disabled={isVerifyingOtp}
+                                >
+                                  <InputOTPGroup className="gap-2 sm:gap-2.5">
+                                    <InputOTPSlot index={0} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
+                                    <InputOTPSlot index={1} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
+                                    <InputOTPSlot index={2} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
+                                    <InputOTPSlot index={3} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
+                                    <InputOTPSlot index={4} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
+                                    <InputOTPSlot index={5} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
+                                  </InputOTPGroup>
+                                </InputOTP>
+                              </div>
+
+                              {/* Timers & Actions */}
+                              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/40 text-xs">
+                                <span className="flex items-center gap-1.5 text-muted-foreground">
+                                  <Clock className="size-3.5 text-gold" />
+                                  {otpExpirySeconds > 0 ? (
+                                    <span>Code expires in <strong className="text-gold font-mono">{formatTimer(otpExpirySeconds)}</strong></span>
+                                  ) : (
+                                    <span className="text-amber-400 font-medium">Code expired. Please request a new code.</span>
+                                  )}
+                                </span>
+
+                                <button
+                                  type="button"
+                                  disabled={resendCooldownSeconds > 0 || isSendingOtp}
+                                  onClick={handleSendOtp}
+                                  className={cn(
+                                    "font-semibold transition-colors",
+                                    resendCooldownSeconds > 0
+                                      ? "text-muted-foreground/60 cursor-not-allowed"
+                                      : "text-gold hover:underline cursor-pointer",
+                                  )}
+                                >
+                                  {resendCooldownSeconds > 0
+                                    ? `Resend OTP in ${resendCooldownSeconds}s`
+                                    : "Didn't receive code? Resend OTP"}
+                                </button>
+                              </div>
+
+                              {/* Manual Verify Button */}
+                              <div className="pt-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleVerifyOtp()}
+                                  disabled={otpCode.length !== 6 || isVerifyingOtp || otpExpirySeconds <= 0}
+                                  className={cn(
+                                    "w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gold py-2.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95",
+                                    (otpCode.length !== 6 || isVerifyingOtp || otpExpirySeconds <= 0) && "opacity-60 cursor-not-allowed",
+                                  )}
+                                >
+                                  {isVerifyingOtp ? (
+                                    <>
+                                      <RefreshCw className="size-3.5 animate-spin" />
+                                      <span>Verifying Code...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span>Confirm Code</span>
+                                      <Check className="size-3.5" />
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* OTP Error Message */}
+                          {otpErrorMessage && (
+                            <div className="mt-3 flex items-center gap-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive-foreground">
+                              <AlertCircle className="size-4 shrink-0 text-destructive" />
+                              <span>{otpErrorMessage}</span>
+                            </div>
+                          )}
+
+                          {/* OTP Status Notice */}
+                          {otpStatusMessage && (
+                            <div className="mt-3 flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-xs text-emerald-400">
+                              <Check className="size-4 shrink-0 text-emerald-400" />
+                              <span>{otpStatusMessage}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Next Button */}
+                    <div className="mt-8 pt-4 border-t border-border/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <span className="text-xs text-muted-foreground">
+                        {!isEmailVerified ? (
+                          <span className="flex items-center gap-1.5 text-gold/80">
+                            <Lock className="size-3.5" />
+                            <span>Verify your email above to continue</span>
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 text-emerald-400">
+                            <Check className="size-3.5" />
+                            <span>Verification complete</span>
+                          </span>
+                        )}
+                      </span>
+
+                      <button
+                        type="button"
+                        disabled={!isEmailVerified}
+                        onClick={handleNextStep}
+                        className={cn(
+                          "inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold transition-all duration-300 sm:w-auto",
+                          isEmailVerified
+                            ? "bg-gold text-primary-foreground shadow-[var(--shadow-gold)] hover:brightness-110 active:scale-95 cursor-pointer"
+                            : "bg-charcoal border border-border/60 text-muted-foreground/40 cursor-not-allowed opacity-60",
+                        )}
+                      >
+                        <span>Next: Project Scope</span>
+                        <ArrowRight className="size-4" />
+                      </button>
+                    </div>
                   </div>
+                )}
 
-                  {/* Email Field */}
-                  <div>
-                    <label
-                      htmlFor="contact-email"
-                      className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                    >
-                      Email <span className="text-gold">*</span>
-                    </label>
-                    <input
-                      id="contact-email"
-                      type="email"
-                      required
-                      disabled={isSubmitting}
-                      value={fields.email}
-                      onChange={update("email")}
-                      placeholder="you@company.com"
-                      className={cn(inputClass, isSubmitting && "opacity-70 cursor-not-allowed")}
-                    />
+                {/* ======================================================== */}
+                {/* TAB 2: PROJECT SCOPE & MESSAGE */}
+                {/* ======================================================== */}
+                {activeTab === "project" && (
+                  <div className="space-y-5 animate-in fade-in duration-200">
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      {/* Business Name Field */}
+                      <div>
+                        <label
+                          htmlFor="contact-business"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                        >
+                          Business Name
+                        </label>
+                        <input
+                          id="contact-business"
+                          type="text"
+                          disabled={isSubmitting}
+                          value={fields.business}
+                          onChange={update("business")}
+                          placeholder="Your company or studio"
+                          className={inputClass}
+                        />
+                      </div>
+
+                      {/* Project Type / Plan Dropdown */}
+                      <div>
+                        <label
+                          htmlFor="contact-plan"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                        >
+                          Project Type / Plan
+                        </label>
+                        <select
+                          id="contact-plan"
+                          disabled={isSubmitting}
+                          value={fields.projectType}
+                          onChange={update("projectType")}
+                          className={cn(inputClass, "cursor-pointer")}
+                        >
+                          <option value="">Select a plan or service</option>
+                          <optgroup label="Website Plans">
+                            <option value="Starter Plan">Starter Plan (Up to 5 Pages)</option>
+                            <option value="Professional Plan">Professional Plan — Recommended</option>
+                            <option value="Premium Plan">
+                              Premium Plan (Complete Digital Presence)
+                            </option>
+                          </optgroup>
+                          <optgroup label="Custom Web Services">
+                            <option value="Web Design">Web Design</option>
+                            <option value="Website Development">Website Development</option>
+                            <option value="Website Redesign">Website Redesign</option>
+                            <option value="Business Website">Business Website</option>
+                            <option value="Portfolio Website">Portfolio Website</option>
+                            <option value="E-commerce Website">E-commerce Website</option>
+                            <option value="Custom Web Solution">Custom Web Solution</option>
+                          </optgroup>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Message Textarea */}
+                    <div>
+                      <label
+                        htmlFor="contact-message"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                      >
+                        Project Details & Goals <span className="text-gold">*</span>
+                      </label>
+                      <textarea
+                        id="contact-message"
+                        required
+                        disabled={isSubmitting}
+                        rows={5}
+                        value={fields.message}
+                        onChange={update("message")}
+                        placeholder="Tell us about your project requirements, target timeline, and goals..."
+                        className={cn(inputClass, "resize-none")}
+                      />
+                    </div>
+
+                    {/* Step 2 Buttons */}
+                    <div className="mt-8 pt-4 border-t border-border/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("contact")}
+                        className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-gold transition-colors order-2 sm:order-1"
+                      >
+                        <ArrowLeft className="size-4" />
+                        <span>Back to Contact Info</span>
+                      </button>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={cn(
+                          "inline-flex items-center justify-center gap-2 rounded-full bg-gold px-9 py-4 text-sm font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all duration-300 hover:brightness-110 active:scale-95 sm:w-auto order-1 sm:order-2",
+                          isSubmitting && "cursor-not-allowed opacity-80",
+                        )}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <RefreshCw className="size-4 animate-spin" />
+                            <span>Submitting Verified Inquiry...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Submit Inquiry</span>
+                            <Send className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Business Name Field */}
-                  <div>
-                    <label
-                      htmlFor="contact-business"
-                      className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                    >
-                      Business Name
-                    </label>
-                    <input
-                      id="contact-business"
-                      type="text"
-                      disabled={isSubmitting}
-                      value={fields.business}
-                      onChange={update("business")}
-                      placeholder="Your company or studio"
-                      className={cn(inputClass, isSubmitting && "opacity-70 cursor-not-allowed")}
-                    />
-                  </div>
-
-                  {/* Project Type / Plan Dropdown */}
-                  <div>
-                    <label
-                      htmlFor="contact-plan"
-                      className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                    >
-                      Project Type / Plan
-                    </label>
-                    <select
-                      id="contact-plan"
-                      disabled={isSubmitting}
-                      value={fields.projectType}
-                      onChange={update("projectType")}
-                      className={cn(inputClass, "cursor-pointer", isSubmitting && "opacity-70 cursor-not-allowed")}
-                    >
-                      <option value="">Select a plan or service</option>
-                      <optgroup label="Website Plans">
-                        <option value="Starter Plan">Starter Plan (Up to 5 Pages)</option>
-                        <option value="Professional Plan">Professional Plan — Recommended</option>
-                        <option value="Premium Plan">
-                          Premium Plan (Complete Digital Presence)
-                        </option>
-                      </optgroup>
-                      <optgroup label="Custom Web Services">
-                        <option value="Web Design">Web Design</option>
-                        <option value="Website Development">Website Development</option>
-                        <option value="Website Redesign">Website Redesign</option>
-                        <option value="Business Website">Business Website</option>
-                        <option value="Portfolio Website">Portfolio Website</option>
-                        <option value="E-commerce Website">E-commerce Website</option>
-                        <option value="Custom Web Solution">Custom Web Solution</option>
-                      </optgroup>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Message Textarea */}
-                <div className="mt-5">
-                  <label
-                    htmlFor="contact-message"
-                    className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                  >
-                    Message <span className="text-gold">*</span>
-                  </label>
-                  <textarea
-                    id="contact-message"
-                    required
-                    disabled={isSubmitting}
-                    rows={5}
-                    value={fields.message}
-                    onChange={update("message")}
-                    placeholder="Tell us about your project requirements, target timeline, and goals..."
-                    className={cn(inputClass, "resize-none", isSubmitting && "opacity-70 cursor-not-allowed")}
-                  />
-                </div>
-
-                {/* Submit Inquiry Button */}
-                <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={cn(
-                      "group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-9 py-4 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[var(--shadow-gold)] hover:brightness-110 active:scale-95 sm:w-auto",
-                      isSubmitting && "cursor-not-allowed opacity-80",
-                    )}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <RefreshCw className="size-4 animate-spin" />
-                        <span>Submitting Inquiry...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Submit Inquiry</span>
-                        <Send className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                      </>
-                    )}
-                  </button>
-
-                  <span className="text-xs text-muted-foreground">Direct reply to {EMAIL}</span>
-                </div>
+                )}
 
                 {/* Success State Box */}
                 {sent && (
@@ -475,9 +956,9 @@ export function Contact() {
                     </div>
 
                     <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                      Thank you! Your project inquiry has been delivered directly to{" "}
+                      Thank you! Your verified inquiry has been stored securely and dispatched directly to{" "}
                       <span className="font-semibold text-foreground">{EMAIL}</span>. We will review
-                      your project goals and respond via email within 24 hours.
+                      your project goals and respond to <span className="font-semibold text-foreground">{fields.email}</span> within 24 hours.
                     </p>
 
                     <div className="mt-4 flex flex-wrap items-center gap-2.5">
