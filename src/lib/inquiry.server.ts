@@ -235,7 +235,7 @@ function renderOtpEmailHtml(otp: string): string {
                 </span>
               </div>
               <p style="margin: 14px 0 0; font-size: 12px; color: #8e95a5;">
-                This code expires in <strong style="color: #d4af37;">60 seconds</strong> and can only be used once.
+                This code expires in <strong style="color: #d4af37;">5 minutes</strong> and can only be used once.
               </p>
             </td>
           </tr>
@@ -328,13 +328,13 @@ export async function sendInquiryOtp(
 
   const otpHash = hashOtp(email, otp, serverSecret);
 
-  // Store in active sessions (strictly 60-second expiry, max 5 attempts)
+  // Store in active sessions (strictly 5-minute expiry, max 5 attempts)
   activeOtpSessions.set(email, {
     email,
     otpHash,
     attempts: 0,
     maxAttempts: 5,
-    expiresAt: now + 60 * 1000,
+    expiresAt: now + 5 * 60 * 1000,
     lastSentAt: now,
   });
 
@@ -351,7 +351,7 @@ export async function sendInquiryOtp(
           from: resendFromEmail,
           to: [email],
           subject: `Your Verification Code: ${otp} — MNW Creative Studio`,
-          text: `Your MNW Creative Studio verification code is: ${otp}\n\nThis code expires in 60 seconds and can only be used once.\n\nIf you did not request this code, you can safely disregard this email.`,
+          text: `Your MNW Creative Studio verification code is: ${otp}\n\nThis code expires in 5 minutes and can only be used once.\n\nIf you did not request this code, you can safely disregard this email.`,
           html: renderOtpEmailHtml(otp),
           headers: {
             "X-Priority": "1",
@@ -370,14 +370,14 @@ export async function sendInquiryOtp(
         throw new Error(`Resend API error: ${resendMsg}`);
       }
 
-      // Record session timestamp immediately after dispatch succeeds so user has full 60s
+      // Record session timestamp immediately after dispatch succeeds so user has full 5 minutes
       const dispatchedAt = Date.now();
       activeOtpSessions.set(email, {
         email,
         otpHash,
         attempts: 0,
         maxAttempts: 5,
-        expiresAt: dispatchedAt + 60 * 1000,
+        expiresAt: dispatchedAt + 5 * 60 * 1000,
         lastSentAt: dispatchedAt,
       });
     } catch (err: unknown) {
@@ -388,20 +388,9 @@ export async function sendInquiryOtp(
   } else {
     const isProd = typeof process !== "undefined" && process.env && process.env["NODE_ENV"] === "production";
     if (isProd) {
-      const proc = typeof process !== "undefined" && process.env ? process.env : {};
-      const resendDirect = Boolean(process.env?.RESEND_API_KEY);
-      const resendBracket = Boolean((proc as Record<string, string | undefined>)["RESEND_API_KEY"]);
-      const matchingKeyNames = Object.keys(proc).filter((k) => /resend|key|secret|email|mail/i.test(k)).join(", ") || "none";
-      const hasRePrefixValue = Object.entries(proc).some(([_, v]) => typeof v === "string" && v.trim().startsWith("re_"));
-      const razorpayConfigured = Boolean((proc as Record<string, string | undefined>)["RAZORPAY_KEY_SECRET"]);
-      const totalKeys = Object.keys(proc).length;
-
-      console.error(
-        `[InquiryServer] RESEND_API_KEY missing at server runtime. resendDirect=${resendDirect}, resendBracket=${resendBracket}, matchingKeyNames=[${matchingKeyNames}], hasRePrefixValue=${hasRePrefixValue}, razorpayConfigured=${razorpayConfigured}, totalKeys=${totalKeys}`,
-      );
-
+      console.error("[InquiryServer] RESEND_API_KEY server secret is not configured.");
       throw new Error(
-        "Email verification is temporarily unavailable. RESEND_API_KEY server secret is missing.",
+        "Email verification is temporarily unavailable. Server email service is not configured.",
       );
     }
     console.warn(
@@ -417,7 +406,7 @@ export async function sendInquiryOtp(
       ? "A 6-digit verification code has been sent to your email."
       : "RESEND_API_KEY is not configured in .env. Configuration is required for real email delivery. (In development, code was logged to server terminal)",
     cooldownSeconds: 30,
-    expiresInSeconds: 60,
+    expiresInSeconds: 300,
     isConfigured: !!resendApiKey,
     ...(isDev && input.isTestPreview ? { previewOtp: otp } : {}),
   };
@@ -450,10 +439,10 @@ export async function verifyInquiryOtp(
 
   const now = Date.now();
 
-  // Check Expiry (strictly 60 seconds)
+  // Check Expiry (strictly 5 minutes = 300 seconds)
   if (now > session.expiresAt) {
     activeOtpSessions.delete(email);
-    throw new Error("This verification code has expired (valid for 60 seconds). Please request a new code.");
+    throw new Error("This verification code has expired (valid for 5 minutes). Please request a new code.");
   }
 
   // Check Attempt Limits (max 5)

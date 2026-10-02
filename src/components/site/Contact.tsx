@@ -86,13 +86,13 @@ export function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedMessage, setCopiedMessage] = useState(false);
 
-  // 60-Second Expiry Countdown
+  // 5-Minute (300 Seconds) Expiry Countdown
   useEffect(() => {
     if (otpExpirySeconds <= 0) return;
     const interval = setInterval(() => {
       setOtpExpirySeconds((prev) => {
         if (prev <= 1) {
-          setOtpErrorMessage("This verification code has expired (valid for 60 seconds). Please request a new code.");
+          setOtpErrorMessage("Your verification code has expired. Request a new code to continue.");
           return 0;
         }
         return prev - 1;
@@ -167,7 +167,9 @@ export function Contact() {
 
   const formatTimer = (totalSecs: number) => {
     const s = Math.max(0, totalSecs);
-    return `00:${s.toString().padStart(2, "0")}`;
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   // Step 1: Send OTP to entered email
@@ -198,9 +200,9 @@ export function Contact() {
       const res = await requestEmailOtp(email);
       setOtpSent(true);
       setOtpCode("");
-      setOtpExpirySeconds(res.expiresInSeconds || 60); // strictly 60 seconds
+      setOtpExpirySeconds(res.expiresInSeconds || 300); // 5 minutes = 300 seconds
       setResendCooldownSeconds(res.cooldownSeconds || 30); // 30 seconds
-      setOtpStatusMessage(res.message || "Verification code sent! Please check your inbox.");
+      setOtpStatusMessage(res.message || "A 6-digit verification code has been sent to your email.");
     } catch (err: unknown) {
       setOtpErrorMessage(
         err instanceof Error ? err.message : "Failed to send verification code. Please try again.",
@@ -633,17 +635,17 @@ export function Contact() {
                     <div className="pt-1">
                       {isEmailVerified ? (
                         /* Prominent Email Verified Badge */
-                        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/40 p-4.5 flex items-center justify-between gap-3 shadow-[0_0_20px_oklch(0.72_0.17_153_/_15%)]">
+                        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-4 sm:p-4.5 flex items-center justify-between gap-3 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
                           <div className="flex items-center gap-3">
-                            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 shadow-sm">
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 shadow-sm">
                               <Check className="size-5" />
                             </span>
                             <div>
-                              <span className="text-sm font-extrabold text-emerald-300 tracking-wide block">
+                              <span className="text-xs sm:text-sm font-bold text-emerald-300 tracking-wide block">
                                 Email Verified ✓
                               </span>
                               <span className="text-xs text-muted-foreground">
-                                Verified access to <span className="text-foreground">{verifiedEmail}</span>
+                                Verified address: <span className="text-foreground font-medium">{verifiedEmail}</span>
                               </span>
                             </div>
                           </div>
@@ -654,18 +656,25 @@ export function Contact() {
                         </div>
                       ) : (
                         /* Verification Trigger & OTP Entry Panel */
-                        <div className="rounded-2xl border border-border/80 bg-charcoal/60 p-4.5 sm:p-5">
+                        <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-[#14161c] to-[#0c0e12] p-5 sm:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.45)] relative overflow-hidden backdrop-blur-sm">
+                          {/* Subtle studio gold accent line */}
+                          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+
                           {!otpSent ? (
                             /* Trigger Button */
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                              <div>
-                                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                                  <ShieldCheck className="size-4 text-gold" />
-                                  <span>Email Verification Required</span>
-                                </span>
-                                <p className="text-[0.72rem] text-muted-foreground mt-0.5">
-                                  We will send a 6-digit security code to your email.
-                                </p>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5">
+                              <div className="flex items-center gap-3">
+                                <div className="size-9 rounded-xl border border-gold/25 bg-gold/10 flex items-center justify-center text-gold shrink-0 shadow-sm">
+                                  <ShieldCheck className="size-4.5" />
+                                </div>
+                                <div>
+                                  <span className="text-xs sm:text-sm font-semibold text-foreground block">
+                                    Email Verification Required
+                                  </span>
+                                  <p className="text-[0.74rem] text-muted-foreground mt-0.5">
+                                    We'll send a 6-digit verification code to protect your inquiry.
+                                  </p>
+                                </div>
                               </div>
 
                               <button
@@ -673,7 +682,7 @@ export function Contact() {
                                 onClick={handleSendOtp}
                                 disabled={isSendingOtp || !fields.email.trim()}
                                 className={cn(
-                                  "inline-flex items-center justify-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95 shrink-0",
+                                  "inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-gold)] transition-all duration-200 hover:brightness-110 active:scale-[0.98] shrink-0",
                                   (!fields.email.trim() || isSendingOtp) && "opacity-70 cursor-not-allowed",
                                 )}
                               >
@@ -692,24 +701,33 @@ export function Contact() {
                             </div>
                           ) : (
                             /* 6-Digit OTP Input & Timers */
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                                  <ShieldCheck className="size-4 text-gold" />
-                                  <span>Enter 6-Digit Verification Code</span>
-                                </span>
+                            <div className="space-y-4.5">
+                              {/* Premium Verification Header */}
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                <div className="flex items-start gap-3">
+                                  <div className="size-9 rounded-xl border border-gold/30 bg-gold/10 flex items-center justify-center text-gold shrink-0 mt-0.5 shadow-sm">
+                                    <ShieldCheck className="size-4.5" />
+                                  </div>
+                                  <div className="space-y-0.5">
+                                    <h4 className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
+                                      Verify Your Email
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">
+                                      Enter the 6-digit code we sent to{" "}
+                                      <span className="font-medium text-foreground">{fields.email}</span>.
+                                    </p>
+                                  </div>
+                                </div>
+
                                 <button
                                   type="button"
                                   onClick={handleEditEmail}
-                                  className="text-xs text-muted-foreground hover:text-gold underline"
+                                  className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-lg border border-border/80 bg-background/60 px-2.5 py-1 text-[0.72rem] font-medium text-muted-foreground hover:text-gold hover:border-gold/40 transition-colors"
                                 >
-                                  Edit Email
+                                  <Edit2 className="size-3" />
+                                  <span>Change Email</span>
                                 </button>
                               </div>
-
-                              <p className="text-xs text-muted-foreground">
-                                We sent a 6-digit code to <strong className="text-foreground">{fields.email}</strong>.
-                              </p>
 
                               {/* 6-Digit Slot Inputs */}
                               <div className="flex justify-center py-2">
@@ -718,26 +736,33 @@ export function Contact() {
                                   value={otpCode}
                                   onChange={handleOtpChange}
                                   disabled={isVerifyingOtp}
+                                  autoFocus
+                                  containerClassName="justify-center"
                                 >
                                   <InputOTPGroup className="gap-2 sm:gap-2.5">
-                                    <InputOTPSlot index={0} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
-                                    <InputOTPSlot index={1} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
-                                    <InputOTPSlot index={2} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
-                                    <InputOTPSlot index={3} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
-                                    <InputOTPSlot index={4} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
-                                    <InputOTPSlot index={5} className="size-11 sm:size-12 rounded-xl text-lg font-bold border-border/80 bg-charcoal/80 focus:border-gold" />
+                                    <InputOTPSlot index={0} className="w-11 h-13 sm:w-13 sm:h-14 rounded-xl text-xl sm:text-2xl font-mono font-bold border-white/12 bg-black/50 text-foreground transition-all duration-200 hover:border-gold/30 first:rounded-xl first:border-l last:rounded-xl" />
+                                    <InputOTPSlot index={1} className="w-11 h-13 sm:w-13 sm:h-14 rounded-xl text-xl sm:text-2xl font-mono font-bold border-white/12 bg-black/50 text-foreground transition-all duration-200 hover:border-gold/30 first:rounded-xl first:border-l last:rounded-xl" />
+                                    <InputOTPSlot index={2} className="w-11 h-13 sm:w-13 sm:h-14 rounded-xl text-xl sm:text-2xl font-mono font-bold border-white/12 bg-black/50 text-foreground transition-all duration-200 hover:border-gold/30 first:rounded-xl first:border-l last:rounded-xl" />
+                                    <InputOTPSlot index={3} className="w-11 h-13 sm:w-13 sm:h-14 rounded-xl text-xl sm:text-2xl font-mono font-bold border-white/12 bg-black/50 text-foreground transition-all duration-200 hover:border-gold/30 first:rounded-xl first:border-l last:rounded-xl" />
+                                    <InputOTPSlot index={4} className="w-11 h-13 sm:w-13 sm:h-14 rounded-xl text-xl sm:text-2xl font-mono font-bold border-white/12 bg-black/50 text-foreground transition-all duration-200 hover:border-gold/30 first:rounded-xl first:border-l last:rounded-xl" />
+                                    <InputOTPSlot index={5} className="w-11 h-13 sm:w-13 sm:h-14 rounded-xl text-xl sm:text-2xl font-mono font-bold border-white/12 bg-black/50 text-foreground transition-all duration-200 hover:border-gold/30 first:rounded-xl first:border-l last:rounded-xl" />
                                   </InputOTPGroup>
                                 </InputOTP>
                               </div>
 
-                              {/* Timers & Actions */}
-                              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/40 text-xs">
+                              {/* Timers & Resend Action */}
+                              <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-white/8 text-xs">
                                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Clock className="size-3.5 text-gold" />
+                                  <Clock className="size-3.5 text-gold shrink-0" />
                                   {otpExpirySeconds > 0 ? (
-                                    <span>Code expires in <strong className="text-gold font-mono">{formatTimer(otpExpirySeconds)}</strong></span>
+                                    <span>
+                                      Code expires in{" "}
+                                      <strong className="text-gold font-mono font-semibold tracking-wide">
+                                        {formatTimer(otpExpirySeconds)}
+                                      </strong>
+                                    </span>
                                   ) : (
-                                    <span className="text-amber-400 font-medium">Code expired. Please request a new code.</span>
+                                    <span className="text-rose-400 font-medium">Code expired</span>
                                   )}
                                 </span>
 
@@ -746,27 +771,35 @@ export function Contact() {
                                   disabled={resendCooldownSeconds > 0 || isSendingOtp}
                                   onClick={handleSendOtp}
                                   className={cn(
-                                    "font-semibold transition-colors",
-                                    resendCooldownSeconds > 0
+                                    "font-medium transition-colors text-xs",
+                                    resendCooldownSeconds > 0 || isSendingOtp
                                       ? "text-muted-foreground/60 cursor-not-allowed"
-                                      : "text-gold hover:underline cursor-pointer",
+                                      : "text-gold hover:text-gold/90 hover:underline cursor-pointer",
                                   )}
                                 >
-                                  {resendCooldownSeconds > 0
-                                    ? `Resend OTP in ${resendCooldownSeconds}s`
-                                    : "Didn't receive code? Resend OTP"}
+                                  {isSendingOtp ? (
+                                    <span className="inline-flex items-center gap-1.5">
+                                      <RefreshCw className="size-3 animate-spin" />
+                                      <span>Resending...</span>
+                                    </span>
+                                  ) : resendCooldownSeconds > 0 ? (
+                                    `Resend OTP in ${resendCooldownSeconds}s`
+                                  ) : (
+                                    "Didn't receive code? Resend OTP"
+                                  )}
                                 </button>
                               </div>
 
-                              {/* Manual Verify Button */}
-                              <div className="pt-2">
+                              {/* Manual Confirm Code Button */}
+                              <div className="pt-1">
                                 <button
                                   type="button"
                                   onClick={() => handleVerifyOtp()}
                                   disabled={otpCode.length !== 6 || isVerifyingOtp || otpExpirySeconds <= 0}
                                   className={cn(
-                                    "w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gold py-2.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 active:scale-95",
-                                    (otpCode.length !== 6 || isVerifyingOtp || otpExpirySeconds <= 0) && "opacity-60 cursor-not-allowed",
+                                    "w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gold py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-primary-foreground shadow-[var(--shadow-gold)] transition-all duration-200 hover:brightness-110 active:scale-[0.99]",
+                                    (otpCode.length !== 6 || isVerifyingOtp || otpExpirySeconds <= 0) &&
+                                      "opacity-60 cursor-not-allowed hover:brightness-100 active:scale-100",
                                   )}
                                 >
                                   {isVerifyingOtp ? (
@@ -776,8 +809,8 @@ export function Contact() {
                                     </>
                                   ) : (
                                     <>
-                                      <span>Confirm Code</span>
-                                      <Check className="size-3.5" />
+                                      <span>Confirm Verification Code</span>
+                                      <Check className="size-4" />
                                     </>
                                   )}
                                 </button>
@@ -785,19 +818,33 @@ export function Contact() {
                             </div>
                           )}
 
-                          {/* OTP Error Message */}
+                          {/* OTP Error Notice */}
                           {otpErrorMessage && (
-                            <div className="mt-3 flex items-center gap-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive-foreground">
-                              <AlertCircle className="size-4 shrink-0 text-destructive" />
-                              <span>{otpErrorMessage}</span>
+                            <div className="mt-3.5 flex items-start gap-2.5 rounded-xl border border-rose-500/30 bg-rose-950/25 p-3 text-xs text-rose-300 shadow-sm animate-in fade-in duration-200">
+                              <AlertCircle className="size-4 shrink-0 text-rose-400 mt-0.5" />
+                              <div className="space-y-0.5">
+                                <span className="font-semibold block text-rose-300">
+                                  {otpExpirySeconds === 0 ? "Code expired" : "Verification Notice"}
+                                </span>
+                                <span className="text-rose-400/90 leading-relaxed block">
+                                  {otpErrorMessage}
+                                </span>
+                              </div>
                             </div>
                           )}
 
-                          {/* OTP Status Notice */}
+                          {/* OTP Success Status Notice */}
                           {otpStatusMessage && (
-                            <div className="mt-3 flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-xs text-emerald-400">
-                              <Check className="size-4 shrink-0 text-emerald-400" />
-                              <span>{otpStatusMessage}</span>
+                            <div className="mt-3.5 flex items-start gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-950/25 p-3 text-xs text-emerald-300 shadow-sm animate-in fade-in duration-200">
+                              <Check className="size-4 shrink-0 text-emerald-400 mt-0.5" />
+                              <div className="space-y-0.5">
+                                <span className="font-semibold block text-emerald-300">
+                                  Verification code sent
+                                </span>
+                                <span className="text-emerald-400/80 leading-relaxed block">
+                                  {otpStatusMessage}
+                                </span>
+                              </div>
                             </div>
                           )}
                         </div>
