@@ -125,7 +125,7 @@ function Index() {
         {/* 2.5 Strong Editorial Positioning Statement (Inspired by Urban Eats storytelling) */}
         <section className="relative py-28 sm:py-36 overflow-hidden border-t border-white/[0.06] bg-gradient-to-b from-background via-charcoal/20 to-background">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[46rem] rounded-full bg-gold/[0.035] blur-[160px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[22rem] sm:size-[46rem] rounded-full bg-gold/[0.035] blur-[60px] sm:blur-[160px]" />
           </div>
 
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -216,7 +216,7 @@ function Index() {
         {/* 3. Curated Selected Work (Preview) */}
         <section className="relative border-y border-white/[0.06] bg-gradient-to-b from-charcoal/40 via-background to-charcoal/30 py-24 sm:py-32 overflow-hidden">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[44rem] rounded-full bg-gold/[0.04] blur-[160px]" />
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[22rem] sm:size-[44rem] rounded-full bg-gold/[0.04] blur-[60px] sm:blur-[160px]" />
           </div>
 
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -415,7 +415,7 @@ function Index() {
         {/* 4. Core Capabilities — Asymmetric Editorial Bento */}
         <section className="relative py-24 sm:py-32 overflow-hidden border-b border-white/[0.06] bg-gradient-to-b from-background via-charcoal/20 to-background">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[44rem] rounded-full bg-gold/[0.035] blur-[160px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[22rem] sm:size-[44rem] rounded-full bg-gold/[0.035] blur-[60px] sm:blur-[160px]" />
           </div>
 
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -697,7 +697,7 @@ function Index() {
         {/* 6. Pricing & Engagements (Preview) */}
         <section className="relative py-24 sm:py-32 overflow-hidden border-b border-white/[0.06] bg-gradient-to-b from-background via-charcoal/20 to-background">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[44rem] rounded-full bg-gold/[0.03] blur-[160px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[22rem] sm:size-[44rem] rounded-full bg-gold/[0.03] blur-[60px] sm:blur-[160px]" />
           </div>
 
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -886,7 +886,7 @@ function Index() {
         {/* 8. Signature Studio CTA Banner */}
         <section className="relative py-24 sm:py-32 overflow-hidden bg-gradient-to-b from-background via-charcoal/30 to-background">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[44rem] rounded-full bg-gold/[0.04] blur-[160px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[22rem] sm:size-[44rem] rounded-full bg-gold/[0.04] blur-[60px] sm:blur-[160px]" />
           </div>
 
           <div className="mx-auto max-w-5xl px-5 sm:px-8 text-center">

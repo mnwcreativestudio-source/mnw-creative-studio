@@ -8,9 +8,9 @@ export function Hero() {
     <section id="home" className="relative overflow-hidden pt-32 pb-20 sm:pt-40 lg:pb-36">
       {/* Cinematic ambient background lighting */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="animate-glow absolute -top-44 left-1/2 size-[56rem] -translate-x-1/2 rounded-full bg-gradient-to-b from-gold/20 via-gold-deep/10 to-transparent blur-[160px]" />
-        <div className="absolute top-1/4 -left-28 size-[34rem] rounded-full bg-indigo-950/30 blur-[150px]" />
-        <div className="absolute top-1/3 -right-28 size-[38rem] rounded-full bg-gold-deep/15 blur-[160px]" />
+        <div className="animate-glow absolute -top-44 left-1/2 size-[24rem] sm:size-[56rem] -translate-x-1/2 rounded-full bg-gradient-to-b from-gold/20 via-gold-deep/10 to-transparent blur-[60px] sm:blur-[160px]" />
+        <div className="absolute top-1/4 -left-28 size-[18rem] sm:size-[34rem] rounded-full bg-indigo-950/30 blur-[60px] sm:blur-[150px]" />
+        <div className="absolute top-1/3 -right-28 size-[20rem] sm:size-[38rem] rounded-full bg-gold-deep/15 blur-[60px] sm:blur-[160px]" />
         {/* Architectural subtle grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -157,6 +157,7 @@ export function Hero() {
                     alt="Modern dark luxury website designed by MNW Creative Studio"
                     className="w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
                     fetchPriority="high"
+                    loading="eager"
                     decoding="async"
                   />
                 </picture>

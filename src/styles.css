@@ -26,8 +26,8 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --font-display: "Outfit", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Plus Jakarta Sans", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -138,6 +138,7 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
@@ -248,22 +249,30 @@
 }
 
 
-@utility reveal {
-  /* 100% visible by default during SSR and on mobile paint - prevents blank screen */
-  opacity: 1;
-  transform: none;
+/* ==========================================================================
+   Content Visibility & Progressive Enhancement
+   Content is 100% visible by default on ALL devices, networks, and browsers.
+   Animations are optional enhancements and NEVER block rendering or hide content.
+   ========================================================================== */
+
+.reveal,
+.reveal-in {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
 }
 
-@utility reveal-in {
-  opacity: 1;
-  transform: none;
-  animation: reveal-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+/* Subtle, non-blocking entrance enhancement on desktop screens only */
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+  .reveal-in {
+    animation: reveal-subtle 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 }
 
-@keyframes reveal-enter {
+@keyframes reveal-subtle {
   from {
-    opacity: 0.15;
-    transform: translateY(16px);
+    opacity: 0.85;
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -278,6 +287,18 @@
     transform: none !important;
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Mobile GPU Memory & Compositor Optimization (prevents iOS Safari tile drop / 10-15s freeze) */
+@media (max-width: 768px) {
+  [class*="blur-[1"] {
+    filter: blur(50px) !important;
+  }
+  [class*="backdrop-blur-2xl"],
+  [class*="backdrop-blur-xl"] {
+    -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
   }
 }
 
