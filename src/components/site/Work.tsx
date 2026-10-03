@@ -166,14 +166,15 @@ export const projects: Project[] = [
   {
     id: "autodrive",
     name: "AutoDrive",
-    category: "Automotive & Electric Mobility",
+    category: "Luxury Automotive Dealership",
     status: "Demo Project",
     description:
-      "High-performance automotive showcase featuring digital vehicle specifications, 0-60 performance metrics, and test-drive booking.",
+      "A refined digital experience for a curated luxury automotive dealership, combining premium visual presentation with a sophisticated vehicle browsing experience.",
     image: workAutoDrive,
+    liveUrl: "https://autodrive-demo.vercel.app/",
     technologies: ["React", "Stealth Dark UI", "Vehicle Metrics Explorer", "Test-Drive Booking"],
     overview:
-      "AutoDrive is a high-performance electric automotive concept created to exhibit cutting-edge vehicle specs and digital test-drive bookings.",
+      "A refined digital experience for a curated luxury automotive dealership, combining premium visual presentation with a sophisticated vehicle browsing experience.",
     approach:
       "Stealth dark-mode styling, metallic textures, precision performance metrics, and futuristic vehicle presentation.",
     features: [
@@ -445,9 +446,10 @@ export function Work() {
                             href={project.liveUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label={project.id === "autodrive" ? "View AutoDrive Live Demo" : `View ${project.name} Live Demo`}
                             className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-2.5 text-xs sm:text-sm font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                           >
-                            <span>View Live Demo →</span>
+                            <span>{project.id === "autodrive" ? "Live Demo →" : "View Live Demo →"}</span>
                           </a>
                         )}
                       </div>
@@ -619,9 +621,10 @@ export function Work() {
                     href={activeModalProject.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={activeModalProject.id === "autodrive" ? "View AutoDrive Live Demo" : `View ${activeModalProject.name} Live Demo`}
                     className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-2.5 text-xs sm:text-sm font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                   >
-                    <span>View Live Demo →</span>
+                    <span>{activeModalProject.id === "autodrive" ? "Live Demo →" : "View Live Demo →"}</span>
                   </a>
                 )}
                 <button

@@ -29,6 +29,8 @@ import workFitZone from "@/assets/work-fitzone.webp";
 import workFitZoneMobile from "@/assets/work-fitzone-mobile.webp";
 import workTravelExplorer from "@/assets/work-travel-explorer.webp";
 import workTravelExplorerMobile from "@/assets/work-travel-explorer-mobile.webp";
+import workAutoDrive from "@/assets/work-autodrive.webp";
+import workAutoDriveMobile from "@/assets/work-autodrive-mobile.webp";
 import aboutWorkspace from "@/assets/about-workspace.webp";
 import aboutWorkspaceMobile from "@/assets/about-workspace-mobile.webp";
 
@@ -107,6 +109,17 @@ const featuredProjects = [
     image: workTravelExplorer,
     imageMobile: workTravelExplorerMobile,
     liveUrl: "https://travel-explorer-two-alpha.vercel.app/",
+  },
+  {
+    id: "autodrive",
+    name: "AutoDrive",
+    category: "Luxury Automotive Dealership",
+    status: "Demo Project",
+    description:
+      "A refined digital experience for a curated luxury automotive dealership, combining premium visual presentation with a sophisticated vehicle browsing experience.",
+    image: workAutoDrive,
+    imageMobile: workAutoDriveMobile,
+    liveUrl: "https://autodrive-demo.vercel.app/",
   },
 ];
 
@@ -414,9 +427,10 @@ function Index() {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label={project.id === "autodrive" ? "View AutoDrive Live Demo" : `View ${project.name} Live Demo`}
                           className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-4 py-2 text-xs font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                         >
-                          <span>View Live Demo →</span>
+                          <span>{project.id === "autodrive" ? "Live Demo →" : "View Live Demo →"}</span>
                         </a>
                       )}
                     </div>
