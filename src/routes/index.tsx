@@ -25,6 +25,10 @@ import workUrbanEats from "@/assets/work-urban-eats.webp";
 import workUrbanEatsMobile from "@/assets/work-urban-eats-mobile.webp";
 import workLuxuryRealEstate from "@/assets/work-luxury-realestate.webp";
 import workLuxuryRealEstateMobile from "@/assets/work-luxury-realestate-mobile.webp";
+import workFitZone from "@/assets/work-fitzone.webp";
+import workFitZoneMobile from "@/assets/work-fitzone-mobile.webp";
+import workTravelExplorer from "@/assets/work-travel-explorer.webp";
+import workTravelExplorerMobile from "@/assets/work-travel-explorer-mobile.webp";
 import aboutWorkspace from "@/assets/about-workspace.webp";
 import aboutWorkspaceMobile from "@/assets/about-workspace-mobile.webp";
 
@@ -58,7 +62,7 @@ const featuredProjects = [
       "Modern healthcare website with clear service architecture, calm aesthetics, and seamless appointment booking.",
     image: workDental,
     imageMobile: workDentalMobile,
-    liveUrl: "https://wi-dental-clinic.vercel.app",
+    liveUrl: "https://wi-dental-clinic.vercel.app/",
   },
   {
     id: "urban-eats",
@@ -69,7 +73,7 @@ const featuredProjects = [
       "Artisan culinary showcase featuring sensory food photography, digital menus, and streamlined table reservation flows.",
     image: workUrbanEats,
     imageMobile: workUrbanEatsMobile,
-    liveUrl: "https://urban-eats-demo-mnw-three.vercel.app",
+    liveUrl: "https://urban-eats-demo-mnw-three.vercel.app/",
   },
   {
     id: "luxury-real-estate",
@@ -80,6 +84,29 @@ const featuredProjects = [
       "Architectural property showcase with immersive dusk photography, floor plans, and private viewing scheduling.",
     image: workLuxuryRealEstate,
     imageMobile: workLuxuryRealEstateMobile,
+    liveUrl: "https://luxury-real-estate-gules.vercel.app/",
+  },
+  {
+    id: "fitzone-gym",
+    name: "FitZone Gym",
+    category: "Fitness & Club",
+    status: "Demo Project",
+    description:
+      "High-energy fitness club website with interactive membership tiers, trainer spotlights, and real-time class timetables.",
+    image: workFitZone,
+    imageMobile: workFitZoneMobile,
+    liveUrl: "https://fitzone-gym-demo-delta.vercel.app/",
+  },
+  {
+    id: "travel-explorer",
+    name: "Travel Explorer",
+    category: "Travel & Expeditions",
+    status: "Demo Project",
+    description:
+      "Adventure travel portal showcasing curated global expeditions, multi-day itineraries, and custom tour inquiries.",
+    image: workTravelExplorer,
+    imageMobile: workTravelExplorerMobile,
+    liveUrl: "https://travel-explorer-two-alpha.vercel.app/",
   },
 ];
 
@@ -314,10 +341,9 @@ function Index() {
                           href={primaryFeaturedProject.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-3 text-xs font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all"
+                          className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-3 text-xs sm:text-sm font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                         >
-                          <span>Launch Live Site</span>
-                          <ExternalLink className="size-3" />
+                          <span>View Live Demo →</span>
                         </a>
                       )}
                     </div>
@@ -374,10 +400,10 @@ function Index() {
                       </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between">
+                    <div className="mt-6 pt-4 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-3">
                       <Link
                         to="/work"
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-gold hover:text-gold-soft transition-colors"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-gold hover:text-gold-soft transition-colors py-1.5"
                       >
                         <span>View In-Depth Case Study</span>
                         <ArrowRight className="size-3.5" />
@@ -388,10 +414,9 @@ function Index() {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[0.72rem] font-semibold text-emerald-400/90 hover:text-emerald-300 transition-colors"
+                          className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-4 py-2 text-xs font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                         >
-                          <span>Live Demo</span>
-                          <ExternalLink className="size-3" />
+                          <span>View Live Demo →</span>
                         </a>
                       )}
                     </div>

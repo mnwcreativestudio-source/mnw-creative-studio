@@ -46,7 +46,7 @@ export const projects: Project[] = [
     description:
       "A calm, modern healthcare website with clear service architecture, doctor credentials, and seamless online appointment scheduling.",
     image: workDental,
-    liveUrl: "https://wi-dental-clinic.vercel.app",
+    liveUrl: "https://wi-dental-clinic.vercel.app/",
     technologies: ["React", "TypeScript", "Tailwind CSS", "Appointment Engine", "Vercel Edge"],
     overview:
       "W Dental Clinic needed a clean, welcoming digital front door that communicates professional expertise, alleviates patient anxiety, and makes appointment requests seamless.",
@@ -71,7 +71,7 @@ export const projects: Project[] = [
     description:
       "Artisan culinary showcase featuring sensory photography, categorized digital menus, chef specials, and direct table reservations.",
     image: workUrbanEats,
-    liveUrl: "https://urban-eats-demo-mnw-three.vercel.app",
+    liveUrl: "https://urban-eats-demo-mnw-three.vercel.app/",
     technologies: ["React", "Sensory UI", "Digital Menu System", "Table Booking Flow"],
     overview:
       "Urban Eats is an artisan bistro concept designed to elevate dining reservations through sensory culinary visuals and minimal layout design.",
@@ -96,6 +96,7 @@ export const projects: Project[] = [
     description:
       "High-energy fitness club website with interactive membership tiers, trainer spotlights, and real-time class timetables.",
     image: workFitZone,
+    liveUrl: "https://fitzone-gym-demo-delta.vercel.app/",
     technologies: ["React", "Dynamic Timetable", "Tiered Membership", "Conversion Funnel"],
     overview:
       "FitZone Gym is a dynamic fitness club concept engineered to convert active visitors into recurring gym members through strong branding and clear pricing.",
@@ -120,6 +121,7 @@ export const projects: Project[] = [
     description:
       "Architectural residential showcase with property specifications, high-resolution dusk imagery, and private viewing scheduling.",
     image: workLuxuryRealEstate,
+    liveUrl: "https://luxury-real-estate-gules.vercel.app/",
     technologies: ["React", "Architectural Specs Grid", "Private Scheduler", "Editorial Typography"],
     overview:
       "A high-end architectural real estate concept tailored for premier residential estates, luxury villas, and exclusive coastal residences.",
@@ -144,6 +146,7 @@ export const projects: Project[] = [
     description:
       "Adventure travel portal showcasing curated global expeditions, multi-day itineraries, and custom tour inquiries.",
     image: workTravelExplorer,
+    liveUrl: "https://travel-explorer-two-alpha.vercel.app/",
     technologies: ["React", "Itinerary Engine", "Cinematic Media", "Fast Adaptive Delivery"],
     overview:
       "Travel Explorer is a luxury adventure travel portal built to inspire wanderlust and simplify guided tour discovery across global destinations.",
@@ -322,10 +325,9 @@ export function Work() {
                       href={featuredLiveProject.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-6 py-3.5 text-xs sm:text-sm font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300"
+                      className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-6 py-3.5 text-xs sm:text-sm font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                     >
-                      <span>Launch Live Website</span>
-                      <ExternalLink className="size-3.5" />
+                      <span>View Live Demo →</span>
                     </a>
                   )}
                 </div>
@@ -443,10 +445,9 @@ export function Work() {
                             href={project.liveUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-xs font-semibold text-gold hover:bg-gold hover:text-primary-foreground transition-all duration-300"
+                            className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-2.5 text-xs sm:text-sm font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                           >
-                            <span>Launch Live Site</span>
-                            <ExternalLink className="size-3" />
+                            <span>View Live Demo →</span>
                           </a>
                         )}
                       </div>
@@ -618,10 +619,9 @@ export function Work() {
                     href={activeModalProject.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 py-2.5 px-4 text-xs font-semibold text-emerald-400 transition-all hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300"
+                    className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-950/40 px-5 py-2.5 text-xs sm:text-sm font-semibold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950/70 transition-all duration-300 touch-manipulation cursor-pointer"
                   >
-                    <span>View Live Website</span>
-                    <ArrowUpRight className="size-3.5 text-emerald-400" />
+                    <span>View Live Demo →</span>
                   </a>
                 )}
                 <button
